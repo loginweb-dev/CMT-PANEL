@@ -55,3 +55,14 @@ Route::get('documentos/save/{midata}', function($midata) {
     ]);
     return $documento;
 });
+
+
+//Derivar
+Route::get('derivar/{midata}', function ($midata) {
+    $midata2 = json_decode($midata);
+    $documento = Documento::find($midata2->documento_id);
+    $documento->estado_id = $midata2->estado_id;
+    $documento->save();
+
+    return $documento;
+});

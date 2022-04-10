@@ -9,6 +9,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 @stop
 @section('page_title', __('voyager::generic.'.($edit ? 'edit' : 'add')).' '.$dataType->getTranslatedAttribute('display_name_singular'))
+
 @switch( $dataType->getTranslatedAttribute('slug') )
     @case('documentos')
         @section('page_header')
@@ -17,8 +18,8 @@
                 {{ __('voyager::generic.'.($edit ? 'edit' : 'add')).' '.$dataType->getTranslatedAttribute('display_name_singular') }}
             </h1>
             @include('voyager::multilingual.language-selector')
-            {{-- <a name="" id="" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#modal_remitente" href="#" role="button">Nuevo Remitente</a> --}}
-            <a name="" id="" class="btn btn-sm btn-success" href="#" onclick="save_document()" role="button">Guardar</a>
+            <a class="btn btn-sm btn-primary" href="/admin/personas/create" role="button">Nuevo Remitente Externo</a>
+            {{-- <a name="" id="" class="btn btn-sm btn-success" href="#" onclick="save_document()" role="button">Guardar</a> --}}
         @stop
   
         @break
@@ -74,7 +75,7 @@
                                         $dataTypeRows = $dataType->{($edit ? 'editRows' : 'addRows' )};
                                     @endphp
 
-                                    <div class="form-group col-md-6">
+                                    <div class="form-group col-md-8">
 
                                         @foreach($dataTypeRows as $row)
                                             <!-- GET THE DISPLAY OPTIONS -->
@@ -114,18 +115,21 @@
                                     </div>
 
                                     <!-- Seccion Jonathan Selects -->
-                                    <div class="form-group col-md-6">
-                                        <label for="">Categoría</label>
-                                        <select class="form-control js-example-basic-single" name="document_categoria" id="document_categoria"></select>
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                            <label for="">Destinatario</label>
-                                            <select class="form-control js-example-basic-single" name="user_destinatario" id="user_destinatario"></select>
-                                    </div>
-                                    <div class="form-group col-md-6">
+                                    <div class="form-group col-md-4">
                                         <label for="">Remitente</label>
                                         <select class="form-control js-example-basic-single" name="user_remitente" id="user_remitente"></select>
                                     </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="">Destinatario</label>
+                                        <select class="form-control js-example-basic-single" name="user_destinatario" id="user_destinatario"></select>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="">Categoría</label>
+                                        <select class="form-control js-example-basic-single" name="document_categoria" id="document_categoria"></select>
+                                    </div>
+                                  
+                               
+                                   
                                    
 
                                     <div class="form-group col-md-4 text-center">
@@ -133,12 +137,12 @@
                                     </div>
                                 </div><!-- panel-body -->
 
-                                {{-- <div class="panel-footer">
+                                <div class="panel-footer">
                                     @section('submit-buttons')
                                         <button type="submit" class="btn btn-primary save">{{ __('voyager::generic.save') }}</button>
                                     @stop
                                     @yield('submit-buttons')
-                                </div> --}}
+                                </div>
                             </form>
 
                             <iframe id="form_target" name="form_target" style="display:none"></iframe>
@@ -630,6 +634,26 @@
             <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
             <script>
+                var params = {};
+                var $file;
+                function deleteHandler(tag, isMulti) {
+                    return function() {
+                        $file = $(this).siblings(tag);
+
+                        params = {
+                            slug:   '{{ $dataType->slug }}',
+                            filename:  $file.data('file-name'),
+                            id:     $file.data('id'),
+                            field:  $file.parent().data('field-name'),
+                            multi: isMulti,
+                            _token: '{{ csrf_token() }}'
+                        }
+
+                        $('.confirm_delete_name').text(params.filename);
+                        $('#confirm_delete_modal').modal('show');
+                    };
+                }
+
                 $('document').ready(function () {
                     $('.js-example-basic-single').select2();
                     $('input[name="editor_id"]').val('{{ Auth::user()->id }}');
@@ -637,39 +661,80 @@
                     remitente_interno();
                     doc_categoria();
                     destinatario();
+
+                    $('.toggleswitch').bootstrapToggle();
+                    //Init datepicker for date fields if data-datepicker attribute defined
+                    //or if browser does not handle date inputs
+                    $('.form-group input[type=date]').each(function (idx, elt) {
+                        if (elt.hasAttribute('data-datepicker')) {
+                            elt.type = 'text';
+                            $(elt).datetimepicker($(elt).data('datepicker'));
+                        } else if (elt.type != 'date') {
+                            elt.type = 'text';
+                            $(elt).datetimepicker({
+                                format: 'L',
+                                extraFormats: [ 'YYYY-MM-DD' ]
+                            }).datetimepicker($(elt).data('datepicker'));
+                        }
+                    });
+                    @if ($isModelTranslatable)
+                        $('.side-body').multilingual({"editing": true});
+                    @endif
+                    $('.side-body input[data-slug-origin]').each(function(i, el) {
+                        $(el).slugify();
+                    });
+                    $('.form-group').on('click', '.remove-multi-image', deleteHandler('img', true));
+                    $('.form-group').on('click', '.remove-single-image', deleteHandler('img', false));
+                    $('.form-group').on('click', '.remove-multi-file', deleteHandler('a', true));
+                    $('.form-group').on('click', '.remove-single-file', deleteHandler('a', false));
+
+                    $('#confirm_delete').on('click', function(){
+                        $.post('{{ route('voyager.'.$dataType->slug.'.media.remove') }}', params, function (response) {
+                            if ( response
+                                && response.data
+                                && response.data.status
+                                && response.data.status == 200 ) {
+
+                                toastr.success(response.data.message);
+                                $file.parent().fadeOut(300, function() { $(this).remove(); })
+                            } else {
+                                toastr.error("Error removing file.");
+                            }
+                        });
+
+                        $('#confirm_delete_modal').modal('hide');
+                    });
+                    $('[data-toggle="tooltip"]').tooltip();
+                    
                     
                 });
 
                 //Cargar Remitentes por defecto (Internos)
                 async function remitente_interno(){
+                    
                     var user = await axios.get("{{ setting('admin.url') }}api/users");
-
                     $('#user_remitente').find('option').remove().end();
-
                     $('#user_remitente').append($('<option>', {
                         value: 0,
                         text: 'Elige un Remitente'
                     }));
-
                     for (let index = 0; index < user.data.length; index++) {
                         $('#user_remitente').append($('<option>', {
                             value: user.data[index].id,
                             text: user.data[index].name
                         }));
                     }
+                    // toastr.info('Cargando nueva lista: '+$('#user_remitente').text())
                 }
 
                 //Cargar Remitentes Externos
                 async function remitente_externo(){
                     var user = await axios.get("{{ setting('admin.url') }}api/personas");
-
                     $('#user_remitente').find('option').remove().end();
-                    
                     $('#user_remitente').append($('<option>', {
                         value: 0,
                         text: 'Elige un Remitente'
                     }));
-
                     for (let index = 0; index < user.data.length; index++) {
                         $('#user_remitente').append($('<option>', {
                             value: user.data[index].id,
@@ -681,12 +746,10 @@
                 //Cargar Remitente Según el Tipo de Persona (Interno/Externo)
                 $("select[name='tipo']").on('change', function() {
                     agregar_remitente(this.value);
-                    console.log(this.value);
-                    // console.log('hola')
+                    toastr.info('Cargando nueva lista: '+this.value)
                 });
 
                 async function agregar_remitente(tipo){
-                    //var tipo= $("input[name='tipo']").val();
                     if(tipo=="Interno"){
                         remitente_interno();
                     }
@@ -697,22 +760,18 @@
                 }
 
                 $('#user_remitente').on('change', function() {
-                    var remitente = $('#user_remitente').val();
-                    $('input[name="persona_id"]').val(remitente);
+                    $('input[name="remitente_id"]').val(this.value);
+                    toastr.info('Cambio de Remitente')
                 });
-
 
                 //Funcion Categorias para documento
                 async function doc_categoria(){
                     var categoria = await axios.get("{{ setting('admin.url') }}api/categorias");
-
                     $('#document_categoria').find('option').remove().end();
-
                     $('#document_categoria').append($('<option>', {
                         value: 0,
                         text: 'Elige una Categoría'
                     }));
-
                     for (let index = 0; index < categoria.data.length; index++) {
                         $('#document_categoria').append($('<option>', {
                             value: categoria.data[index].id,
@@ -722,21 +781,18 @@
                 }
 
                 $('#document_categoria').on('change', function() {
-                    var categoria = $('#document_categoria').val();
-                    $('input[name="categoria_id"]').val(categoria);
+                    $('input[name="categoria_id"]').val(this.value);
+                    toastr.info('Cambio de Categoria')
                 });
 
                 //Funcion Destinatarios para documento
                 async function destinatario(){
                     var destinatario = await axios.get("{{ setting('admin.url') }}api/users");
-
                     $('#user_destinatario').find('option').remove().end();
-
                     $('#user_destinatario').append($('<option>', {
                         value: 0,
                         text: 'Elige un Destinatario'
                     }));
-
                     for (let index = 0; index < destinatario.data.length; index++) {
                         $('#user_destinatario').append($('<option>', {
                             value: destinatario.data[index].id,
@@ -746,13 +802,11 @@
                 }
 
                 $('#user_destinatario').on('change', function() {
-                    var destinatario = $('#user_destinatario').val();
-                    $('input[name="user_id"]').val(destinatario);
+                    $('input[name="destinatario_id"]').val(this.value);
+                    toastr.info('Cambio de Destinatario')
                 });
 
-
                 async function save_document(){
-
                     var name= $('input[name="name"]').val();
                     var description=$('input[name="description"]').val();
                     var estado_id=$('input[name="estado_id"]').val();
@@ -763,103 +817,84 @@
                     var user_id=$('input[name="user_id"]').val();
                     var editor_id=$('input[name="editor_id"]').val();
                     var copias=$("select[name='documento_belongstomany_user_relationship[]']").val();
-
-                    var midata = JSON.stringify({'name':name, 'description':description, 'estado_id':estado_id, 'categoria_id':categoria_id, 'persona_id':persona_id, 'tipo':tipo, 'user_id':user_id, 'editor_id':editor_id, 'copias':copias});
-                    console.log(midata);
-                    var save= await axios.get("{{ setting('admin.url') }}api/documentos/save/"+midata);
-                    location.href='/admin/documentos';
+                    var midata = JSON.stringify({'name':name, 'description':description, 'estado_id':estado_id, 'categoria_id':categoria_id, 'persona_id':persona_id, 'tipo':tipo, 'user_id':user_id, 'editor_id':editor_id, 'copias':copias, archivo: archivo});
+                    console.log(midata)
+                    // var save= await axios.get("{{ setting('admin.url') }}api/documentos/save/"+midata);
+                    // location.href='/admin/documentos';
                 }
-
             </script>
 
         @stop
     @break
-
-
-
     @default
-    @section('javascript')
-        <script>
-            var params = {};
-            var $file;
+        @section('javascript')
+            <script>
+                var params = {};
+                var $file;
 
-            function deleteHandler(tag, isMulti) {
-            return function() {
-                $file = $(this).siblings(tag);
+                function deleteHandler(tag, isMulti) {
+                    return function() {
+                        $file = $(this).siblings(tag);
 
-                params = {
-                    slug:   '{{ $dataType->slug }}',
-                    filename:  $file.data('file-name'),
-                    id:     $file.data('id'),
-                    field:  $file.parent().data('field-name'),
-                    multi: isMulti,
-                    _token: '{{ csrf_token() }}'
+                        params = {
+                            slug:   '{{ $dataType->slug }}',
+                            filename:  $file.data('file-name'),
+                            id:     $file.data('id'),
+                            field:  $file.parent().data('field-name'),
+                            multi: isMulti,
+                            _token: '{{ csrf_token() }}'
+                        }
+
+                        $('.confirm_delete_name').text(params.filename);
+                        $('#confirm_delete_modal').modal('show');
+                    };
                 }
-
-                $('.confirm_delete_name').text(params.filename);
-                $('#confirm_delete_modal').modal('show');
-            };
-            }
-
-            $('document').ready(function () {
-                $('.toggleswitch').bootstrapToggle();
-
-                //Init datepicker for date fields if data-datepicker attribute defined
-                //or if browser does not handle date inputs
-                $('.form-group input[type=date]').each(function (idx, elt) {
-                    if (elt.hasAttribute('data-datepicker')) {
-                        elt.type = 'text';
-                        $(elt).datetimepicker($(elt).data('datepicker'));
-                    } else if (elt.type != 'date') {
-                        elt.type = 'text';
-                        $(elt).datetimepicker({
-                            format: 'L',
-                            extraFormats: [ 'YYYY-MM-DD' ]
-                        }).datetimepicker($(elt).data('datepicker'));
-                    }
-                });
-
-                @if ($isModelTranslatable)
-                    $('.side-body').multilingual({"editing": true});
-                @endif
-
-                $('.side-body input[data-slug-origin]').each(function(i, el) {
-                    $(el).slugify();
-                });
-
-                $('.form-group').on('click', '.remove-multi-image', deleteHandler('img', true));
-                $('.form-group').on('click', '.remove-single-image', deleteHandler('img', false));
-                $('.form-group').on('click', '.remove-multi-file', deleteHandler('a', true));
-                $('.form-group').on('click', '.remove-single-file', deleteHandler('a', false));
-
-                $('#confirm_delete').on('click', function(){
-                    $.post('{{ route('voyager.'.$dataType->slug.'.media.remove') }}', params, function (response) {
-                        if ( response
-                            && response.data
-                            && response.data.status
-                            && response.data.status == 200 ) {
-
-                            toastr.success(response.data.message);
-                            $file.parent().fadeOut(300, function() { $(this).remove(); })
-                        } else {
-                            toastr.error("Error removing file.");
+                $('document').ready(function () {
+                    $('.toggleswitch').bootstrapToggle();
+                    //Init datepicker for date fields if data-datepicker attribute defined
+                    //or if browser does not handle date inputs
+                    $('.form-group input[type=date]').each(function (idx, elt) {
+                        if (elt.hasAttribute('data-datepicker')) {
+                            elt.type = 'text';
+                            $(elt).datetimepicker($(elt).data('datepicker'));
+                        } else if (elt.type != 'date') {
+                            elt.type = 'text';
+                            $(elt).datetimepicker({
+                                format: 'L',
+                                extraFormats: [ 'YYYY-MM-DD' ]
+                            }).datetimepicker($(elt).data('datepicker'));
                         }
                     });
+                    @if ($isModelTranslatable)
+                        $('.side-body').multilingual({"editing": true});
+                    @endif
+                    $('.side-body input[data-slug-origin]').each(function(i, el) {
+                        $(el).slugify();
+                    });
+                    $('.form-group').on('click', '.remove-multi-image', deleteHandler('img', true));
+                    $('.form-group').on('click', '.remove-single-image', deleteHandler('img', false));
+                    $('.form-group').on('click', '.remove-multi-file', deleteHandler('a', true));
+                    $('.form-group').on('click', '.remove-single-file', deleteHandler('a', false));
 
-                    $('#confirm_delete_modal').modal('hide');
+                    $('#confirm_delete').on('click', function(){
+                        $.post('{{ route('voyager.'.$dataType->slug.'.media.remove') }}', params, function (response) {
+                            if ( response
+                                && response.data
+                                && response.data.status
+                                && response.data.status == 200 ) {
+
+                                toastr.success(response.data.message);
+                                $file.parent().fadeOut(300, function() { $(this).remove(); })
+                            } else {
+                                toastr.error("Error removing file.");
+                            }
+                        });
+
+                        $('#confirm_delete_modal').modal('hide');
+                    });
+                    $('[data-toggle="tooltip"]').tooltip();
                 });
-                $('[data-toggle="tooltip"]').tooltip();
-
-            
-
-
-            });
-
-            function save_document() {
-                toastr.success('Guardando')
-            }
-        </script>
-    @stop
-
+            </script>
+        @stop
 @endswitch
 

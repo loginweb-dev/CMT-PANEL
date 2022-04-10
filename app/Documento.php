@@ -15,11 +15,36 @@ class Documento extends Model
 	'description',
 	'estado_id',
 	'categoria_id',
-	'persona_id',
 	'archivo',
 	'tipo',
-	'user_id',
+	'remitente_id',
 	'editor_id'
 	];
 	// protected $appends=['published'];
+
+
+	public function editor()
+    {
+        return $this->belongsTo(User::class, 'editor_id');
+    }
+	public function remitente_interno()
+    {
+        return $this->belongsTo(User::class, 'remitente_id');
+    }
+	public function remitente_externo()
+    {
+        return $this->belongsTo(Persona::class, 'remitente_id');
+    }
+	public function destinatario()
+    {
+        return $this->belongsTo(User::class, 'destinatario_id');
+    }
+	public function categoria()
+    {
+        return $this->belongsTo(Categoria::class, 'categoria_id');
+    }
+	public function estado()
+    {
+        return $this->belongsTo(Estado::class, 'estado_id');
+    }
 }

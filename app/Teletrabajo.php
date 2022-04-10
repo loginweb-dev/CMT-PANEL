@@ -10,5 +10,4 @@ use Carbon\Carbon;
 class Teletrabajo extends Model
 {
 	use SoftDeletes;
-	protected $appends=['published'];
 }
