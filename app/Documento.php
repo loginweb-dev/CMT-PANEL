@@ -17,7 +17,8 @@ class Documento extends Model
 	'categoria_id',
 	'archivo',
 	'tipo',
-	'remitente_id',
+	'remitente_id_interno',
+    'remitente_id_externo',
 	'editor_id'
 	];
 	// protected $appends=['published'];
@@ -29,11 +30,11 @@ class Documento extends Model
     }
 	public function remitente_interno()
     {
-        return $this->belongsTo(User::class, 'remitente_id');
+        return $this->belongsTo(User::class, 'remitente_id_interno');
     }
 	public function remitente_externo()
     {
-        return $this->belongsTo(Persona::class, 'remitente_id');
+        return $this->belongsTo(Persona::class, 'remitente_id_externo');
     }
 	public function destinatario()
     {

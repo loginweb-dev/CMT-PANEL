@@ -19,7 +19,7 @@
             </h1>
             @include('voyager::multilingual.language-selector')
             <a class="btn btn-sm btn-primary" href="/admin/personas/create" role="button">Nuevo Remitente Externo</a>
-            {{-- <a name="" id="" class="btn btn-sm btn-success" href="#" onclick="save_document()" role="button">Guardar</a> --}}
+            <a name="" id="" class="btn btn-sm btn-success" href="#" onclick="save_document()" role="button">Guardar</a>
         @stop
   
         @break
@@ -49,7 +49,7 @@
                             <form role="form"
                                     class="form-edit-add"
                                     action="{{ $edit ? route('voyager.'.$dataType->slug.'.update', $dataTypeContent->getKey()) : route('voyager.'.$dataType->slug.'.store') }}"
-                                    method="POST" enctype="multipart/form-data">
+                                    method="POST" enctype="multipart/form-data" id="miform">
                                 <!-- PUT Method if we are editing -->
                                 @if($edit)
                                     {{ method_field("PUT") }}
@@ -111,9 +111,7 @@
                                                 @endif
                                             </div>
                                         @endforeach
-
                                     </div>
-
                                     <!-- Seccion Jonathan Selects -->
                                     <div class="form-group col-md-4">
                                         <label for="">Remitente</label>
@@ -128,10 +126,6 @@
                                         <select class="form-control js-example-basic-single" name="document_categoria" id="document_categoria"></select>
                                     </div>
                                   
-                               
-                                   
-                                   
-
                                     <div class="form-group col-md-4 text-center">
                                         {!! QrCode::generate('QR DE NUEVO REGISTRO!'); !!}
                                     </div>
@@ -657,7 +651,7 @@
                 $('document').ready(function () {
                     $('.js-example-basic-single').select2();
                     $('input[name="editor_id"]').val('{{ Auth::user()->id }}');
-
+                    // $('#user_remitente').val("{{ Auth::user()->id }}");
                     remitente_interno();
                     doc_categoria();
                     destinatario();
@@ -711,7 +705,6 @@
 
                 //Cargar Remitentes por defecto (Internos)
                 async function remitente_interno(){
-                    
                     var user = await axios.get("{{ setting('admin.url') }}api/users");
                     $('#user_remitente').find('option').remove().end();
                     $('#user_remitente').append($('<option>', {
@@ -724,7 +717,9 @@
                             text: user.data[index].name
                         }));
                     }
-                    // toastr.info('Cargando nueva lista: '+$('#user_remitente').text())
+                    $('#user_remitente').val("{{ Auth::user()->id }}");
+                    var remitente_id_interno= $('#user_remitente').val();
+                    var remitente_id_externo= ''; 
                 }
 
                 //Cargar Remitentes Externos
@@ -760,7 +755,19 @@
                 }
 
                 $('#user_remitente').on('change', function() {
-                    $('input[name="remitente_id"]').val(this.value);
+                    //$('input[name="remitente_id"]').val(this.value);
+                    if($("select[name='tipo']").val()=='Interno'){
+                        var remitente_id_interno= $('#user_remitente').val();
+                        var remitente_id_externo= ''; 
+                    }
+                    if($("select[name='tipo']").val()=='Externo'){
+                        var remitente_id_interno= '';
+                        var remitente_id_externo= $('#user_remitente').val(); 
+                    }
+                    $("input[name='remitente_id_interno']").val(remitente_id_interno);
+                    $("input[name='remitente_id_externo']").val(remitente_id_externo);
+
+
                     toastr.info('Cambio de Remitente')
                 });
 
@@ -807,20 +814,48 @@
                 });
 
                 async function save_document(){
-                    var name= $('input[name="name"]').val();
-                    var description=$('input[name="description"]').val();
+                    // console.log($("select[name='tipo']").val());
+                    // if($("select[name='tipo']").val()=='Interno'){
+                    //     var remitente_id_interno= $('#user_remitente').val();
+                    //     var remitente_id_externo= ''; 
+                    // }
+                    // if($("select[name='tipo']").val()=='Externo'){
+                    //     var remitente_id_interno= '';
+                    //     var remitente_id_externo= $('#user_remitente').val(); 
+                    // }
+                    // var name= $('input[name="name"]').val();
+                    // var description=$('input[name="description"]').val();
+
                     var estado_id=$('input[name="estado_id"]').val();
                     var categoria_id=$('input[name="categoria_id"]').val();
-                    var persona_id=$('input[name="persona_id"]').val();
-                    var archivo=$('input[name="archivo[]"]').val();
+                    var archivo=$('input[name="archivo"]').val();
+                    var pdf=$('input[name="pdf[]"]').val();
                     var tipo =$("select[name='tipo']").val();
-                    var user_id=$('input[name="user_id"]').val();
                     var editor_id=$('input[name="editor_id"]').val();
                     var copias=$("select[name='documento_belongstomany_user_relationship[]']").val();
-                    var midata = JSON.stringify({'name':name, 'description':description, 'estado_id':estado_id, 'categoria_id':categoria_id, 'persona_id':persona_id, 'tipo':tipo, 'user_id':user_id, 'editor_id':editor_id, 'copias':copias, archivo: archivo});
-                    console.log(midata)
-                    // var save= await axios.get("{{ setting('admin.url') }}api/documentos/save/"+midata);
-                    // location.href='/admin/documentos';
+                    var remitente_id_interno= $('input[name="remitente_id_interno"]').val();
+                    var remitente_id_externo= $('input[name="remitente_id_externo"]').val(); 
+                    var midata = JSON.stringify({'estado_id':estado_id, 'categoria_id':categoria_id, 'tipo':tipo, 'editor_id':editor_id, 'copias':copias, archivo: archivo, 'remitente_id_interno':remitente_id_interno, 'remitente_id_externo':remitente_id_externo});
+
+                    
+                    //var save= await axios.get("{{ setting('admin.url') }}api/documentos/save/"+midata);
+                    //location.href='/admin/documentos';
+
+                    var midata2 = {
+                        'estado_id': estado_id, 
+                        'categoria_id': categoria_id, 
+                        'tipo': tipo, 
+                        'editor_id': editor_id, 
+                        'copias': copias, 
+                        'archivo': archivo, 
+                        'pdf': pdf,
+                        'remitente_id_interno': remitente_id_interno, 
+                        'remitente_id_externo': remitente_id_externo
+                    }
+                    console.log(midata2)
+                    var misave = await axios.post('https://panel.cmt.gob.bo/api/documento/save', midata2)
+                    console.log(misave.data)
+
                 }
             </script>
 

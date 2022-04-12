@@ -37,6 +37,11 @@ Route::get('categorias', function () {
     return  Categoria::all();
 });
 
+//Todos los estados
+Route::get('estados', function () {
+    return  Estado::all();
+});
+
 //
 
 Route::get('documentos/save/{midata}', function($midata) {
@@ -50,7 +55,9 @@ Route::get('documentos/save/{midata}', function($midata) {
         //'archivo'=>$midata2->archivo,
         'tipo'=>$midata2->tipo,
         'user_id'=>$midata2->user_id,
-        'editor_id'=>$midata2->editor_id
+        'editor_id'=>$midata2->editor_id,
+        'remitente_id_interno'=>$midata2->remitente_id_interno,
+        'remitente_id_externo'=>$midata2->remitente_id_externo
 
     ]);
     return $documento;
@@ -65,4 +72,10 @@ Route::get('derivar/{midata}', function ($midata) {
     $documento->save();
 
     return $documento;
+});
+
+// save Documento ajax
+Route::post('documento/save', function (Request $request) {
+
+    return $request;
 });
