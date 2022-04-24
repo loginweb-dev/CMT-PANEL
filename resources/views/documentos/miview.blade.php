@@ -30,12 +30,12 @@
 					<a href="#" onclick="derivar_a_terceros('{{$midata->id}}')"data-toggle="modal" data-target="#derivar_a_terceros" class="btn btn-success">Derivar</a>
 					<a href="#" onclick="derivar('{{ $midata->id }}')" class="btn btn-danger">Rechazar</a>
 					<br>
-				
+
 						<div class="col-sm-4 form-group">
 							Mensaje Recibido: <p>{{ $midata->message }}</p>
 							<textarea class="form-control"></textarea>
 						</div>
-						
+
 						<div class="col-sm-4 form-group">
 							<label for="">Image</label>
 							<input type="file" name="" id="" class="form-control">
@@ -44,15 +44,23 @@
 							<label for="">PDF</label>
 							<input type="file" name="" id="" class="form-control">
 						</div>
-		
+
 					@break
 				@default
-					
+
 			@endswitch
 		</div>
 		<div class="row">
 			<div class="col-sm-6">
-			
+
+                <div class="form-group col-md-4">
+                    <label for="">Imagen Auxiliar</label>
+                    <select class="form-control js-example-basic-single" value="{{$midata->archivo}}" name="user_remitente" id="user_remitente"></select>
+                </div>
+
+                <input type="text" class="form-control" id="total_ventas" value="{{$midata->archivo}}" readonly>
+
+
 				<table class="table table-responsive">
 					<tbody>
 						<tr>
@@ -60,8 +68,12 @@
 							<td>{{ $midata->id }}</td>
 						</tr>
 						<tr>
-							<td>PDF</td>
+							<td>PDFs</td>
 							<td>{{ $midata->pdf }}</td>
+						</tr>
+                        <tr>
+							<td>Images</td>
+							<td>{{ $midata->archivo }}</td>
 						</tr>
 						<tr>
 							<td>Estado</td>
@@ -87,8 +99,8 @@
 							<td>Copia Destinatarios</td>
 							<td>
 								@foreach ($copia as $item)
-									@php 
-										$user = TCG\Voyager\Models\User::where('id', $item->user_id)->first();								
+									@php
+										$user = TCG\Voyager\Models\User::where('id', $item->user_id)->first();
 									@endphp
 									- {{ $user->name }} <br>
 								@endforeach
@@ -113,11 +125,21 @@
 					</tbody>
 				</table>
 			</div>
-			<div class="col-sm-6 text-cneter">
-				<img class="img-responsive" src="{{ setting('admin.url').'storage/'.$midata->archivo }}" alt="">
+			<div class="col-sm-6 text-center">
+                {{-- @php
+                    $espacio=",";
+                    $vector=($midata->archivo);
+                    $cadena=dividirCadena($vector,$espacio);
+                @endphp
+
+                @foreach ( $cadena as $item )
+                    <img class="img-responsive" src="{{ setting('admin.url').'storage/'.$item }}" alt="">
+                @endforeach --}}
+                <img class="img-responsive" src="{{ setting('admin.url').'storage/'.'documentos\/April2022\/8bVgIeV3UmrayLBVm56G.png' }}" alt="">
+
 			</div>
 		</div>
-	
+
 	</div>
 
 
@@ -137,7 +159,7 @@
 					{{-- <ul class="nav nav-tabs" role="tablist">
 						<li role="presentation" class="active"><a href="#miderivar" aria-controls="miderivar" role="tab" data-toggle="tab"></a></li>
 						<li role="presentation"><a href="#deliverys" aria-controls="deliverys" role="tab" data-toggle="tab">Deliverys</a></li>
-						
+
 					</ul> --}}
 
 					<div class="tab-content">
@@ -164,11 +186,11 @@
 							<a href="#" class="btn btn-sm btn-primary" onclick="save_set_chofer()">Asignar</a>
 						</div> --}}
 					</div>
-				  
+
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
-					
+
 				</div>
 			</div>
 		</div>
@@ -180,6 +202,11 @@
 @section('javascript')
 	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 	<script>
+
+        $('document').ready(function () {
+            division();
+        });
+
 		async function derivar(id) {
 			var midata = JSON.stringify({ documento_id: id, estado_id: 2 })
 			var derivar = await axios("https://panel.cmt.gob.bo/api/derivar/"+midata)
@@ -192,5 +219,29 @@
 
 			$("#derivaciones_otros").append("<tr><td>"+id+"</td><td>"+'Mensaje'+"</td><td>"+'Seleccionar Destinatario'+"</td><td>"+'Fecha'+"</td><td>"+'Agregar mas Destinatario'+"</td></tr>");
 		}
+
+        function dividirCadena(cadenaADividir,separador){
+            var arrayDeCadenas = cadenaADividir.split(separador);
+            return arrayDeCadenas;
+        }
+
+        function division(){
+            // console.log($('#user_remitente').val());
+            // console.log($('#user_remitente').text());
+
+            // var cadenaADividir=["documentos\/April2022\/8bVgIeV3UmrayLBVm56G.png","documentos\/April2022\/Ic4bBSfgXwydxShb9Klx.png","documentos\/April2022\/VmIYJYkK2TdPXbMtV3dN.png"];
+            // var separador='"';
+            // var arrayDeCadenas = cadenaADividir.split(separador);
+            // console.log(arrayDeCadenas);
+
+            // const authHeader = ["documentos\/April2022\/8bVgIeV3UmrayLBVm56G.png","documentos\/April2022\/Ic4bBSfgXwydxShb9Klx.png","documentos\/April2022\/VmIYJYkK2TdPXbMtV3dN.png"]
+            // const split = authHeader.split(',') // (1) [ 'bearer', 'token' ]
+            // const token = split[1] // (2) token
+
+            const token= ["documentos\/April2022\/8bVgIeV3UmrayLBVm56G.png","documentos\/April2022\/Ic4bBSfgXwydxShb9Klx.png","documentos\/April2022\/VmIYJYkK2TdPXbMtV3dN.png"]
+
+            console.log(token);
+        }
+
 	</script>
 @stop

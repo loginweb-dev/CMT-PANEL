@@ -36,13 +36,13 @@
 
         @switch($dataType->getTranslatedAttribute('slug'))
             @case('documentos')
-                
+
                 @break
             @case(2)
-                
+
                 @break
             @default
-                
+
         @endswitch
     </div>
 @stop
@@ -60,7 +60,7 @@
                                     <form method="get" class="form-search">
                                         <div id="search-input">
                                             <div class="col-4">
-                                                <select id="search_key" name="key">                               
+                                                <select id="search_key" name="key">
                                                     <option value="">Elije un Flitro</option>
                                                         <option value="editor_id">Editor</option>
                                                         <option value="remitente_id_interno">Remitente Interno</option>
@@ -68,7 +68,7 @@
                                                         <option value="destinatario_id">Destinatario</option>
                                                         <option value="categoria_id">Categoría</option>
                                                         <option value="estado_id">Estado</option>
-                                                        <option value="tipo">Tipo</option>                                                                                                  
+                                                        <option value="tipo">Tipo</option>
 
                                                 </select>
                                             </div>
@@ -85,18 +85,18 @@
                                                 </select>
                                             </div>
                                             <div class="input-group col-md-12">
-                                                <select id="" name="">                               
-                                                    <option value="">Elije un Opcion</option>                                    
+                                                <select id="" name="">
+                                                    <option value="">Elije un Opcion</option>
                                                 </select>
                                             </div> --}}
                                         </div>
-                                    </form> 
+                                    </form>
                                     @if (Request::has('sort_order') && Request::has('order_by'))
                                         <input type="hidden" name="sort_order" value="{{ Request::get('sort_order') }}">
                                         <input type="hidden" name="order_by" value="{{ Request::get('order_by') }}">
                                     @endif
                                 @endif
-                              
+
                                 <div class="table-responsive">
                                     <table id="dataTable" class="table table-hover">
                                         <thead>
@@ -108,7 +108,7 @@
                                                 @endif
                                                 <th class="actions text-right dt-not-orderable">{{ __('voyager::generic.actions') }}</th>
                                                 @foreach($dataType->browseRows as $row)
-                                                
+
                                                 <th>
                                                     @if ($isServerSide && in_array($row->field, $sortableColumns))
                                                         <a href="{{ $row->sortByUrl($orderBy, $sortOrder) }}">
@@ -126,7 +126,7 @@
                                                     @endif
                                                 </th>
                                                 @endforeach
-                                                
+
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -292,7 +292,7 @@
 
                                                                             @endphp
                                                                             <span>{{ $editor ? $editor->name : null }}</span>
-                                                                            
+
                                                                         @break
                                                                         @case('remitente_id_interno')
                                                                             @php
@@ -300,7 +300,7 @@
 
                                                                             @endphp
                                                                             <span>{{ $remitente_interno ? $remitente_interno->name : null }}</span>
-                                                                                
+
                                                                         @break
                                                                         @case('remitente_id_externo')
                                                                             @php
@@ -308,7 +308,7 @@
 
                                                                             @endphp
                                                                             <span>{{ $remitente_externo ? $remitente_externo->display : null }}</span>
-                                                                                
+
                                                                         @break
                                                                         @case('destinatario_id')
                                                                             @php
@@ -316,7 +316,7 @@
 
                                                                             @endphp
                                                                             <span>{{ $destinatario ? $destinatario->name : null }}</span>
-                                                                                
+
                                                                         @break
                                                                         @case('categoria_id')
                                                                             @php
@@ -329,19 +329,19 @@
                                                                             $estado = App\Estado::find($data->{$row->field});
                                                                             @endphp
                                                                             <span>{{ $estado ? $estado->name : null }}</span>
-                                                                                
+
                                                                         @break
                                                                         @default
                                                                             @include('voyager::multilingual.input-hidden-bread-browse')
                                                                             <span>{{ $data->{$row->field} }}</span>
                                                                     @endswitch
-                                                                   
+
                                                                 @endif
                                                             </td>
                                                         @endforeach
 
-                                                       
-                                                
+
+
                                                     </tr>
                                                 @elseif(Auth::user()->role_id == 3 OR Auth::user()->role_id == 1 OR Auth::user()->id == $data->editor_id)
                                                     <tr>
@@ -490,7 +490,7 @@
                                                                         {{ trans_choice('voyager::media.files', 0) }}
                                                                     @endif
                                                                 @else
-                                                                    
+
                                                                     @switch($row->field)
                                                                         @case('editor_id')
                                                                             @php
@@ -498,7 +498,7 @@
 
                                                                             @endphp
                                                                             <span>{{ $editor ? $editor->name : null }}</span>
-                                                                            
+
                                                                         @break
                                                                         @case('remitente_id_interno')
                                                                         @php
@@ -506,7 +506,7 @@
 
                                                                         @endphp
                                                                         <span>{{ $remitente_interno ? $remitente_interno->name : null }}</span>
-                                                                            
+
                                                                         @break
                                                                         @case('remitente_id_externo')
                                                                             @php
@@ -514,7 +514,7 @@
 
                                                                             @endphp
                                                                             <span>{{ $remitente_externo ? $remitente_externo->display : null }}</span>
-                                                                                
+
                                                                         @break
                                                                         @case('destinatario_id')
                                                                             @php
@@ -522,7 +522,7 @@
 
                                                                             @endphp
                                                                             <span>{{ $destinatario ? $destinatario->name : null }}</span>
-                                                                                
+
                                                                         @break
                                                                         @case('categoria_id')
                                                                             @php
@@ -535,7 +535,7 @@
                                                                             $estado = App\Estado::find($data->{$row->field});
                                                                             @endphp
                                                                             <span>{{ $estado ? $estado->name : null }}</span>
-                                                                                
+
                                                                         @break
                                                                         @default
                                                                             @include('voyager::multilingual.input-hidden-bread-browse')
@@ -546,7 +546,7 @@
                                                                 @endif
                                                             </td>
                                                         @endforeach
-                                                  
+
                                                     </tr>
                                                 @endif
                                             @endforeach
@@ -580,10 +580,10 @@
                                     <form method="get" class="form-search">
                                         <div id="search-input">
                                             <div class="col-2">
-                                                <select id="search_key" name="key">                               
+                                                <select id="search_key" name="key">
                                                     <option value="">Elije un Flitro</option>
                                                         <option value="">Categorias</option>
-                                                        <option value="">Gestion</option>                                   
+                                                        <option value="">Gestion</option>
                                                 </select>
                                             </div>
                                             <div class="col-2">
@@ -593,12 +593,12 @@
                                                 </select>
                                             </div>
                                             <div class="input-group col-md-12">
-                                                <select id="" name="">                               
-                                                    <option value="">Elije un Opcion</option>                                    
+                                                <select id="" name="">
+                                                    <option value="">Elije un Opcion</option>
                                                 </select>
                                             </div>
                                         </div>
-                                    </form> 
+                                    </form>
                                     @if (Request::has('sort_order') && Request::has('order_by'))
                                     <input type="hidden" name="sort_order" value="{{ Request::get('sort_order') }}">
                                     <input type="hidden" name="order_by" value="{{ Request::get('order_by') }}">
@@ -818,10 +818,10 @@
                                     <form method="get" class="form-search">
                                         <div id="search-input">
                                             <div class="col-2">
-                                                <select id="search_key" name="key">                               
+                                                <select id="search_key" name="key">
                                                     <option value="">Elije un Flitro</option>
                                                         <option value="">Categorias</option>
-                                                        <option value="">Gestion</option>                                   
+                                                        <option value="">Gestion</option>
                                                 </select>
                                             </div>
                                             <div class="col-2">
@@ -831,12 +831,12 @@
                                                 </select>
                                             </div>
                                             <div class="input-group col-md-12">
-                                                <select id="" name="">                               
-                                                    <option value="">Elije un Opcion</option>                                    
+                                                <select id="" name="">
+                                                    <option value="">Elije un Opcion</option>
                                                 </select>
                                             </div>
                                         </div>
-                                    </form> 
+                                    </form>
                                     @if (Request::has('sort_order') && Request::has('order_by'))
                                     <input type="hidden" name="sort_order" value="{{ Request::get('sort_order') }}">
                                     <input type="hidden" name="order_by" value="{{ Request::get('order_by') }}">

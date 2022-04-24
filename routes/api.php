@@ -6,7 +6,11 @@ use TCG\Voyager\Models\User;
 use App\Persona;
 use App\Categoria;
 use App\Documento;
+use App\Convocatoria;
+use App\CatConvocatoria;
 
+use App\Gaceta;
+use App\CatGaceta;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -76,6 +80,32 @@ Route::get('derivar/{midata}', function ($midata) {
 
 // save Documento ajax
 Route::post('documento/save', function (Request $request) {
-
     return $request;
+});
+
+Route::get('images/{id}', function($id){
+    return Documento::find($id);
+});
+
+//Convocatorias
+Route::get('convocatorias', function () {
+    return Convocatoria::with('categoria')->get();
+});
+Route::get('catconvocatoria/', function(){
+    return CatConvocatoria::all();
+});
+Route::get('convocatorias/filtro/{categoria_id}/{gestion}', function($categoria_id, $gestion){
+    return Convocatoria::where('categoria_id', $categoria_id)->where('gestion', $gestion)->with('categoria')->get();
+});
+
+
+//Gacetas
+Route::get('gacetas', function () {
+    return Gaceta::with('categoria')->get();
+});
+Route::get('catgacetas/', function(){
+    return CatGaceta::all();
+});
+Route::get('gacetas/filtro/{categoria_id}/{gestion}', function($categoria_id, $gestion){
+    return Gaceta::where('categoria_id', $categoria_id)->where('gestion', $gestion)->with('categoria')->get();
 });

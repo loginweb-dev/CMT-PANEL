@@ -11,5 +11,15 @@ use Carbon\Carbon;
 class Gaceta extends Model
 {
     use SoftDeletes;
-	protected $appends=['published'];
+    protected $fillable = [
+        'name',
+        'file',
+        'categoria_id',
+        'editor_id',
+        'gestion'
+        ];
+	public function categoria()
+    {
+        return $this->belongsTo(CatGaceta::class, 'categoria_id');
+    }
 }
