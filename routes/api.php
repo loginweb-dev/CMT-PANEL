@@ -89,13 +89,13 @@ Route::get('images/{id}', function($id){
 
 //Convocatorias
 Route::get('convocatorias', function () {
-    return Convocatoria::with('categoria')->get();
+    return Convocatoria::with('categoria')->orderBy('name', 'asc')->get();
 });
 Route::get('catconvocatoria/', function(){
     return CatConvocatoria::all();
 });
 Route::get('convocatorias/filtro/{categoria_id}/{gestion}', function($categoria_id, $gestion){
-    return Convocatoria::where('categoria_id', $categoria_id)->where('gestion', $gestion)->with('categoria')->get();
+    return Convocatoria::where('categoria_id', $categoria_id)->where('gestion', $gestion)->orderBy('name', 'asc')->with('categoria')->get();
 });
 
 
@@ -107,5 +107,5 @@ Route::get('catgacetas/', function(){
     return CatGaceta::all();
 });
 Route::get('gacetas/filtro/{categoria_id}/{gestion}', function($categoria_id, $gestion){
-    return Gaceta::where('categoria_id', $categoria_id)->where('gestion', $gestion)->with('categoria')->get();
+    return Gaceta::where('categoria_id', $categoria_id)->where('gestion', $gestion)->orderBy('name', 'asc')->with('categoria')->get();
 });

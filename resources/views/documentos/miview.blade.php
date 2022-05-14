@@ -53,13 +53,13 @@
 		<div class="row">
 			<div class="col-sm-6">
 
-                <div class="form-group col-md-4">
+                {{-- <div class="form-group col-md-4">
                     <label for="">Imagen Auxiliar</label>
                     <select class="form-control js-example-basic-single" value="{{$midata->archivo}}" name="user_remitente" id="user_remitente"></select>
                 </div>
 
                 <input type="text" class="form-control" id="total_ventas" value="{{$midata->archivo}}" readonly>
-
+ --}}
 
 				<table class="table table-responsive">
 					<tbody>
@@ -127,12 +127,12 @@
 			</div>
 			<div class="col-sm-6 text-center">
                 {{-- @php
-                    $espacio=",";
-                    $vector=($midata->archivo);
-                    $cadena=dividirCadena($vector,$espacio);
-                @endphp
 
-                @foreach ( $cadena as $item )
+                    const $vector=$midata->archivo;
+
+                @endphp --}}
+
+                {{-- @foreach ( $cadena as $item )
                     <img class="img-responsive" src="{{ setting('admin.url').'storage/'.$item }}" alt="">
                 @endforeach --}}
                 <img class="img-responsive" src="{{ setting('admin.url').'storage/'.'documentos\/April2022\/8bVgIeV3UmrayLBVm56G.png' }}" alt="">
@@ -239,8 +239,8 @@
             // const token = split[1] // (2) token
 
             const token= ["documentos\/April2022\/8bVgIeV3UmrayLBVm56G.png","documentos\/April2022\/Ic4bBSfgXwydxShb9Klx.png","documentos\/April2022\/VmIYJYkK2TdPXbMtV3dN.png"]
-
-            console.log(token);
+            //const token =vector;
+            console.log(token[1]);
         }
 
 	</script>
