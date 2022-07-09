@@ -131,6 +131,19 @@
                                         </thead>
                                         <tbody>
                                             @foreach($dataTypeContent as $data)
+                                                @php
+                                                    $destinatarios=App\RelUserDoc::where('documento_id',$data->id)->get();
+                                                    $copias=[];
+                                                    foreach ($destinatarios as $item) {
+                                                        array_push($copias,$item->user_id);
+                                                    }
+
+                                                    $derivadores=App\RelDerivDoc::where('documento_id',$data->id)->get();
+                                                    $deriv=[];
+                                                    foreach ($derivadores as $item) {
+                                                        array_push($deriv,$item->user_id);
+                                                    }
+                                                @endphp
                                                 @if ($data->destinatario_id == Auth::user()->id AND $data->estado_id == 2)
                                                     <tr>
                                                         @if($showCheckboxColumn)
@@ -343,7 +356,7 @@
 
 
                                                     </tr>
-                                                @elseif(Auth::user()->role_id == 3 OR Auth::user()->role_id == 1 OR Auth::user()->id == $data->editor_id)
+                                                @elseif(Auth::user()->role_id == 3 OR Auth::user()->role_id == 1 OR Auth::user()->id == $data->editor_id OR in_array(Auth::user()->id, $copias) OR in_array(Auth::user()->id, $deriv))
                                                     <tr>
                                                         @if($showCheckboxColumn)
                                                             <td>
@@ -1329,10 +1342,10 @@
 
 <!-- ---------------------JS-------------------  -->
 <!-- ---------------------JS-------------------  -->
-<script src="https://socket.loginweb.dev/socket.io/socket.io.js"></script>
+{{-- <script src="https://socket.loginweb.dev/socket.io/socket.io.js"></script>
 <script>
     const socket = io('https://socket.loginweb.dev')
-</script>
+</script> --}}
 @section('javascript')
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- DataTables -->

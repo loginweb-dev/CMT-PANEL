@@ -48,4 +48,8 @@ class Documento extends Model
     {
         return $this->belongsTo(Estado::class, 'estado_id');
     }
+    public function copias()
+    {
+        return $this->hasMany(RelUserDoc::class);
+    }
 }

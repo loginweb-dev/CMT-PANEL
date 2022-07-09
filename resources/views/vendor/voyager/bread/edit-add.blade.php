@@ -18,7 +18,7 @@
                 {{ __('voyager::generic.'.($edit ? 'edit' : 'add')).' '.$dataType->getTranslatedAttribute('display_name_singular') }}
             </h1>
             @include('voyager::multilingual.language-selector')
-            <a class="btn btn-sm btn-primary" href="/admin/personas/create" role="button">Nuevo Remitente Externo</a>
+            <a class="btn btn-sm btn-dark" href="/admin/personas/create" role="button">Nuevo Remitente Externo</a>
             {{-- <a name="" id="" class="btn btn-sm btn-success" href="#" onclick="save_document()" role="button">Guardar</a> --}}
         @stop
 
@@ -107,7 +107,7 @@
                                     <!-- Seccion Jonathan Selects -->
                                     <div class="form-group col-md-4">
                                         <label for="">Remitente</label>
-                                        <select class="form-control js-example-basic-single" name="user_remitente" id="user_remitente"></select>
+                                        <select class="form-control js-example-basic-single" name="user_remitente" id="user_remitente" ></select>
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="">Destinatario</label>
@@ -678,6 +678,7 @@
 
     @case('documentos')
         @section('javascript')
+            <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
             <script>
                 var params = {};
                 var $file;
@@ -895,7 +896,7 @@
                     {
                         console.log(pdfs[i].name);
                     }
-                    var misave = await axios.post('https://panel.cmt.gob.bo/api/documento/save', midata2)
+                    var misave = await axios.post("{{setting('admin.url')}}api/documento/save", midata2)
                     console.log(misave.data)
 
                 }
@@ -904,6 +905,7 @@
     @break
     @case('convocatorias')
         @section('javascript')
+            <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
             <script>
                 var params = {};
                 var $file;

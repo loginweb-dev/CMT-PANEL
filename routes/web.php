@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Storage;
 
 
 Route::get('/', function () {
-    return redirect('/admin/profile');
-    // return view('welcome');
+    // return redirect('/admin/profile');
+    return view('welcome');
 });
 
 Route::get('/compartir/{id}', function ($id) {
@@ -36,7 +36,41 @@ Route::group(['middleware' => 'auth'], function () {
     })->name('reunion');
 });
 
-// auth
+//paginas ----------------------
+Route::get('/resena-historica', function () {
+    return view('paginas.resena-historica');
+});
+
+Route::get('/biblioteca-legislativa', function () {
+    return view('paginas.biblioteca-legislativa');
+});
+
+Route::get('/estructura-del-concejo', function () {
+    $concejales = App\Concejale::all();
+    return view('paginas.estructura-del-concejo', compact('concejales'));
+});
+
+Route::get('/convocatorias-publicas', function () {
+    $concejales = App\Concejale::all();
+    return view('paginas.convocatorias-publicas', compact('concejales'));
+});
+
+Route::get('/publicaciones-oficiales', function () {
+    $concejales = App\Concejale::all();
+    return view('paginas.publicaciones-oficiales', compact('concejales'));
+});
+
+Route::get('/teletrabajo', function () {
+    $concejales = App\Concejale::all();
+    return view('paginas.teletrabajo', compact('concejales'));
+});
+
+Route::get('/reglamento-general', function () {
+    $reglamento = App\Reglamento::find(1);
+    return view('paginas.reglamento-general', compact('reglamento'));
+});
+
+// auth -------
 Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
@@ -79,3 +113,36 @@ Route::group(['prefix' => 'admin'], function () {
     })->name('multiple_gacetas');
 
 });
+
+Route::post('/respuesta/documento', function (Request $request) {
+    //return $documento_id;
+    $imagenes = $request->file('images_respuesta');
+    $vector_img=[];
+    if ($imagenes!= null) {
+        foreach($imagenes as $file){
+            $newfile =  Storage::disk('public')->put('documentos', $file);
+            array_push($vector_img, $newfile);
+        }
+    }
+    $vector_pdf=[];
+    $pdfs = $request->file('pdf_respuesta');
+    if ($pdfs!=null) {
+        foreach($pdfs as $file){
+            $newfile =  Storage::disk('public')->put('documentos', $file);
+            array_push($vector_pdf, $newfile);
+        }
+    }
+
+    $doc_detalle = App\DocumentoDetalle::create([
+        'documento_id'=>$request->documento_id,
+        'user_id'=>$request->user_id,
+        'mensaje'=>$request->mensaje_respuesta,
+        'image'=>json_encode($vector_img), 
+        'pdf'=>json_encode($vector_pdf),
+        'destinatario_interno'=>$request->destinatario_interno,
+        'destinatario_externo'=>$request->destinatario_externo
+    ]);
+
+    return redirect('admin/documentos');
+    
+})->name('respuesta_documento');

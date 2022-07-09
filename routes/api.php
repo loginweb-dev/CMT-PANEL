@@ -11,6 +11,8 @@ use App\CatConvocatoria;
 
 use App\Gaceta;
 use App\CatGaceta;
+use App\DocumentoDetalle;
+use App\RelDerivDoc;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -29,6 +31,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // TODAS LOS USER
 Route::get('users', function () {
     return  User::all();
+});
+
+//Buscar un Usuario
+Route::get('find/user/{id}', function($id){
+    return User::find($id);
 });
 
 //Todas las personas
@@ -78,6 +85,54 @@ Route::get('derivar/{midata}', function ($midata) {
     return $documento;
 });
 
+//Responder
+Route::post('responder', function (Request $request) {
+    $documento = Documento::find($request->documento_id);
+    $documento->estado_id = 3;
+    $documento->save();
+    $detalle = DocumentoDetalle::create([
+        'documento_id' => $request->documento_id,
+        'user_id' => $request->user_id,
+        'mensaje' => $request->mensaje
+    ]);
+    return true;
+});
+//Rechazar
+Route::post('rechazar', function (Request $request) {
+    $documento = Documento::find($request->documento_id);
+    $documento->estado_id = 4;
+    $documento->save();
+    $detalle = DocumentoDetalle::create([
+        'documento_id' => $request->documento_id,
+        'user_id' => $request->user_id,
+        'mensaje' => $request->mensaje
+    ]);
+    return true;
+});
+Route::post('derivar2', function (Request $request) {
+    $documento = Documento::find($request->documento_id);
+    $documento->estado_id = 2;
+    $documento->destinatario_id = $request->destinatario;
+    $documento->save();
+    $detalle = DocumentoDetalle::create([
+        'documento_id' => $request->documento_id,
+        'user_id' => $request->user_id,
+        'mensaje' => $request->mensaje,
+        'destinatario' => $request->destinatario
+    ]);
+    return true;
+});
+Route::post('registrar/first/detalle', function (Request $request) {
+    $detalle = DocumentoDetalle::create([
+        'documento_id' => $request->documento_id,
+        'user_id' => $request->user_id,
+        'mensaje' => $request->mensaje,
+        'destinatario' => $request->destinatario
+    ]);
+});
+
+
+
 // save Documento ajax
 Route::post('documento/save', function (Request $request) {
     return $request;
@@ -94,6 +149,7 @@ Route::get('convocatorias', function () {
 Route::get('catconvocatoria/', function(){
     return CatConvocatoria::all();
 });
+
 Route::get('convocatorias/filtro/{categoria_id}/{gestion}', function($categoria_id, $gestion){
     return Convocatoria::where('categoria_id', $categoria_id)->where('gestion', $gestion)->orderBy('name', 'asc')->with('categoria')->get();
 });
@@ -101,11 +157,51 @@ Route::get('convocatorias/filtro/{categoria_id}/{gestion}', function($categoria_
 
 //Gacetas
 Route::get('gacetas', function () {
-    return Gaceta::with('categoria')->get();
+    return Gaceta::with('categoria')->orderBy('name', 'desc')->limit(15)->get();
 });
+
 Route::get('catgacetas/', function(){
     return CatGaceta::all();
 });
-Route::get('gacetas/filtro/{categoria_id}/{gestion}', function($categoria_id, $gestion){
-    return Gaceta::where('categoria_id', $categoria_id)->where('gestion', $gestion)->orderBy('name', 'asc')->with('categoria')->get();
+
+Route::post('gacetas/filtro', function(Request $request){
+    return Gaceta::where('categoria_id', $request->categoria)->where('gestion', $request->gestion)->orderBy('name', 'asc')->with('categoria')->get();
+});
+
+Route::post('gacetas/buscar', function(Request $request){
+    $result = Gaceta::where('name', 'like', '%'.$request->criterio.'%')->orderBy('name', 'desc')->with('categoria')->get();
+    return $result;
+});
+
+Route::get('gacetas/totales', function () {
+    $total = Gaceta::count();
+    return response()->json(['total' => $total]);
+});
+
+//Restablecer Password
+Route::post('credenciales', function(Request $request){
+    $user=User::where('phone',$request->phone)->first();
+    if ($user!=null) {
+        $user->password=Hash::make($request->password);
+        $user->save();
+    }
+    return $user;
+});
+
+//Buscar Documento
+Route::get('find/documento/{id}', function($id){
+    return Documento::where('id', $id)->with('remitente_interno', 'remitente_externo', 'destinatario', 'copias', 'categoria')->first();
+});
+
+//Save Rel Deriv Docs
+Route::post('save/rel/deriv', function(Request $request){
+    RelDerivDoc::create([
+        'documento_id' => $request->documento_id,
+        'user_id' => $request->user_id
+    ]);
+});
+
+//Get Documento DetalLe
+Route::get('find/documento/detalle/{id}', function($id){
+    return DocumentoDetalle::where('documento_id',$id)->get();
 });
