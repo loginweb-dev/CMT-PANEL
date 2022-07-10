@@ -16,18 +16,21 @@ class DocumentoDetalle extends Model
         'image', 
         'pdf',
 		'destinatario_interno',
-        'destinatario_externo'
+        'destinatario_externo',
+        'estado_id'
         ];
 
-
-    // public function remitente_interno()
-    // {
-    //     return $this->belongsTo(User::class, 'remitente_id_interno');
-    // }
-    // public function remitente_externo()
-    // {
-    //     return $this->belongsTo(Persona::class, 'remitente_id_externo');
-    // }
+    protected $appends=['published', 'fecha'];
+    public function getPublishedAttribute(){
+        return Carbon::createFromTimeStamp(strtotime($this->attributes['created_at']) )->diffForHumans();
+    }
+    public function getFechaAttribute(){
+        return date('Y-m-d', strtotime($this->attributes['created_at']));
+    }
+    public function estado()
+    {
+        return $this->belongsTo(Estado::class, 'estado_id');
+    }
     public function destinatario_interno()
     {
         return $this->belongsTo(User::class, 'destinatario_interno');

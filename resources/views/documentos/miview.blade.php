@@ -314,12 +314,13 @@
 										<div class="col-sm-12 form-group">
 											{{-- Mensaje Recibido: <p>{{ $midata->message }}</p> --}}
 											<label for="mensaje_respuesta">Escribe un Mensaje</label>
-											<textarea class="form-control" name="mensaje_respuesta"></textarea>
+											<textarea class="form-control" name="mensaje_respuesta_respondido" required></textarea>
 										</div>
 										<input type="text" name="user_id" value="{{Auth::user()->id}}" hidden>
 										<input type="text" name="documento_id" value="{{$midata->id}}" hidden>
 										<input type="text" name="destinatario_interno" value="{{$remitente_interno}}" hidden>
 										<input type="text" name="destinatario_externo" value="{{$remitente_externo}}" hidden>
+										<input type="text" name="estado_id_responder" value="3" hidden>
 
 
 										<div class="col-sm-12 form-group">
@@ -345,7 +346,7 @@
                                     <div class="col-sm-12 form-group">
 										{{-- Mensaje Recibido: <p>{{ $midata->message }}</p> --}}
 										<label for="mensaje_respuesta">Escribe un Mensaje</label>
-										<textarea class="form-control" name="mensaje_respuesta"></textarea>
+										<textarea class="form-control" name="mensaje_respuesta_derivado" required></textarea>
 									</div>
 									<div class="col-sm-12 form-group">
 										<label for="usuario_derivar">Usuarios</label>
@@ -361,7 +362,7 @@
 									<div class="col-sm-12 form-group">
 										{{-- Mensaje Recibido: <p>{{ $midata->message }}</p> --}}
 										<label for="mensaje_respuesta">Escribe un Mensaje</label>
-										<textarea class="form-control" name="mensaje_respuesta"></textarea>
+										<textarea class="form-control" name="mensaje_respuesta_rechazado" required></textarea>
 									</div>
 									<div class="col-sm-12 form-group">
 										<a href="#" onclick="rechazar('{{ $midata->id }}')" class="btn btn-danger">Rechazar <i class="voyager-x"></i></a>
@@ -406,46 +407,52 @@
 										{{-- <td>ID</td>
 										<td>Documento ID</td>
 										<td>User ID</td> --}}
+										<td>Orden</td>
 										<td>Mensaje</td>
 										<td>Imagen</td>
 										<td>PDF</td>
+										<td>Remitente</td>
 										<td>Destinatario</td>
+										<td>Estado</td>
 										{{-- <td>Destinatario Interno</td> --}}
 										<td>Fecha</td>
 									</tr>
 								</thead>
 									
 								<tbody>
+									@php
+										$index_arbol_orden=0;
+									@endphp
 									@foreach ($detalle as $item)
 										@php
-											$destinatario_arbol="";
+											$index_arbol_orden+=1;
 										@endphp
-										@if ($item->destinatario_interno)
-											@php
-												$data_destinatario_arbol= TCG\Voyager\Models\User::find($item->destinatario_interno);
-												$destinatario_arbol=$data_destinatario_arbol->name;
-											@endphp
-										@else
-											@php
-												$data_destinatario_arbol= App\Persona::find($item->destinatario_externo);
-												// $destinatario_arbol=$data_destinatario_arbol->display;
-											@endphp
-										@endif
-										
 										<tr>
 											{{-- <td>{{ $item->id }}</td>
 											<td>{{$item->documento_id}}</td>
 											<td>{{$item->user_id}}</td> --}}
+											<td>
+												{{$index_arbol_orden}}
+											</td>
 											<td>{{$item->mensaje}}</td>
 											<td>
-												<div id="images_arbol"></div>
+												<div id="images_arbol_{{$item->id}}"></div>
 											</td>
 											<td>
-												<div id="pdfs_arbol"></div>
+												<div id="pdfs_arbol_{{$item->id}}"></div>
 											</td>
-											<td>{{$destinatario_arbol }}</td>
+											<td>
+												<div id="remitente_arbol_{{$item->id}}"></div>
+											</td>
+											<td>
+												<div id="destinatario_arbol_{{$item->id}}"></div>
+												{{-- {{$destinatario_arbol }} --}}
+											</td>
+											<td>
+												{{ $item->estado->name }}
+											</td>
 											{{-- <td>{{$item->destinatario_externo}}</td> --}}
-											<td>{{$item->created_at}}</td>
+											<td>{{$item->published}}</td>
 										</tr>
 									@endforeach
 								</tbody>
@@ -477,6 +484,8 @@
 			mostrar_pdfs_documento()
 			mostrar_imgs_arbol()
 			mostrar_pdfs_arbol()
+			remitente_arbol()
+			destinatario_arbol()
 			//array_pdf()
 			//array_imagenes()
             //division();
@@ -484,109 +493,175 @@
 		async function mostrar_imgs_documento(){
 			var id='{{$midata->id}}'
 			var images= await array_imagenes(id)
-			var lista=""
-			for (let index = 0; index < images.length; index++) {
-				//lista+="<tr><td>"+images[index]+"</td><tr>"
-				// lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+images[index]+"' class='link-primary'>"+images[index]+"</a></td></tr>"
-				lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+images[index]+"' class='link-primary'><img class='img-responsive' src='{{ setting('admin.url').'storage/' }}"+images[index]+"' ></a></td></tr>"
+			if (images) {
+				var lista=""
+				for (let index = 0; index < images.length; index++) {
+					//lista+="<tr><td>"+images[index]+"</td><tr>"
+					// lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+images[index]+"' class='link-primary'>"+images[index]+"</a></td></tr>"
+					lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+images[index]+"' class='link-primary'><img class='img-responsive' src='{{ setting('admin.url').'storage/' }}"+images[index]+"' ></a></td></tr>"
 
-				//lista+="<tr><td><img class='img-responsive' src='{{ setting('admin.url').'storage/' }}"+images[index]+"' alt=''></td></tr>"
-				// $('#images_body').html("<tr><td>"+images[index]+"</td><tr>")
+					//lista+="<tr><td><img class='img-responsive' src='{{ setting('admin.url').'storage/' }}"+images[index]+"' alt=''></td></tr>"
+					// $('#images_body').html("<tr><td>"+images[index]+"</td><tr>")
+				}
+				$('#images_body').html(lista)
 			}
-			$('#images_body').html(lista)
+			
 		}
 		async function mostrar_pdfs_documento(){
 			var id='{{$midata->id}}'
 			var pdfs= await array_pdfs(id)
-			var lista=""
-			for (let index = 0; index < pdfs.length; index++) {
-				//lista+="<tr><td>"+pdfs[index]+"</td><tr>"
-				// lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+pdfs[index]+"' class='link-primary'>"+pdfs[index]+"</a></td></tr>"
-				lista+="<tr><td><iframe class='embed-responsive-item' src='https://docs.google.com/viewer?url=https://panel.cmt.gob.bo/storage/documentos//July2022//7g9y6fQo8nENKGxEBUeJ.pdf&embedded=true'  height='200' style='border: none;'></iframe></td></tr>"
+			if (pdfs) {
+				var lista=""
+				for (let index = 0; index < pdfs.length; index++) {
+					//lista+="<tr><td>"+pdfs[index]+"</td><tr>"
+					// lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+pdfs[index]+"' class='link-primary'>"+pdfs[index]+"</a></td></tr>"
+					lista+="<tr><td><iframe class='embed-responsive-item' src='https://docs.google.com/viewer?url=https://panel.cmt.gob.bo/storage/documentos//July2022//7g9y6fQo8nENKGxEBUeJ.pdf&embedded=true'  height='200' style='border: none;'></iframe></td></tr>"
+				}
+				$('#pdf_body').html(lista)
 			}
-			$('#pdf_body').html(lista)
+			
 		}
 
 		async function mostrar_imgs_arbol(){
 			var id='{{$midata->id}}'
 			var detalle= await axios("{{setting('admin.url')}}api/find/documento/detalle/"+id)
+			for (let contador = 0; contador < detalle.data.length; contador++) {
+				if (detalle.data[contador].image) {
+					var images= []
+					var separador=","
+					var arrayDeCadenas = detalle.data[1].image.split(separador);
+					// console.log(pdf)
+					// console.log(images)
+					//console.log(arrayDeCadenas[0])
+					var separador='"'
+					for (let index = 0; index < arrayDeCadenas.length; index++) {
+						var array2= arrayDeCadenas[index].split(separador)
+						images.push(array2[1])
+					}
+					//console.log(images)
+					var lista=""
+					for (let index = 0; index < images.length; index++) {
+						lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+images[index]+"' class='link-primary'>Imagen "+(index+1)+"</a></td></tr>"
+					}
+					$('#images_arbol_'+detalle.data[contador].id+'').html(lista)
+				}
+			}
 			
-			var images= []
-			var separador=","
-			var arrayDeCadenas = detalle.data[1].image.split(separador);
-			// console.log(pdf)
-			// console.log(images)
-			//console.log(arrayDeCadenas[0])
-			var separador='"'
-			for (let index = 0; index < arrayDeCadenas.length; index++) {
-				var array2= arrayDeCadenas[index].split(separador)
-				images.push(array2[1])
-			}
-			//console.log(images)
-			var lista=""
-			for (let index = 0; index < images.length; index++) {
-				lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+images[index]+"' class='link-primary'>Imagen "+(index+1)+"</a></td></tr>"
-			}
-			$('#images_arbol').html(lista)
 		}
 		async function mostrar_pdfs_arbol(){
 			var id='{{$midata->id}}'
 			var detalle= await axios("{{setting('admin.url')}}api/find/documento/detalle/"+id)
+			for (let contador = 0; contador < detalle.data.length; contador++) {
+				if (detalle.data[contador].pdf) {
+					var pdf= []
+					var separador=","
+					var arrayDeCadenas = detalle.data[contador].pdf.split(separador);
+					// console.log(pdf)
+					// console.log(images)
+					//console.log(arrayDeCadenas[0])
+					var separador='"'
+					for (let index = 0; index < arrayDeCadenas.length; index++) {
+						var array2= arrayDeCadenas[index].split(separador)
+						pdf.push(array2[1])
+					}
+					//console.log(pdf)
+					var lista=""
+					for (let index = 0; index < pdf.length; index++) {
+						lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+pdf[index]+"' class='link-primary'>PDF "+(index+1)+"</a></td></tr>"
+					}
+					$('#pdfs_arbol_'+detalle.data[contador].id+'').html(lista)
+				}
+			}
+			
+		}
+		async function remitente_arbol(){
+			var id='{{$midata->id}}'
+			var documento= await axios("{{setting('admin.url')}}api/find/documento/"+id)
+			console.log(documento.data)
+			var detalle= await axios("{{setting('admin.url')}}api/find/documento/detalle/"+id)
+			for (let index = 0; index < detalle.data.length; index++) {
+				if (index==0) {
+					//Cuando se manda por primera vez
+					if (documento.data.remitente_externo) {
+						$('#remitente_arbol_'+detalle.data[index].id+'').html(documento.data.remitente_externo.display)
+					}
+					else{
+						$('#remitente_arbol_'+detalle.data[index].id+'').html(documento.data.remitente_interno.name)
+					}
+				}
+				else{
+					//Cuerpo del Arbol
+					var user= await axios("{{setting('admin.url')}}api/find/user/"+detalle.data[index].user_id)
+					$('#remitente_arbol_'+detalle.data[index].id+'').html(user.data.name)
 
-			var pdf= []
-			var separador=","
-			var arrayDeCadenas = detalle.data[1].pdf.split(separador);
-			// console.log(pdf)
-			// console.log(images)
-			//console.log(arrayDeCadenas[0])
-			var separador='"'
-			for (let index = 0; index < arrayDeCadenas.length; index++) {
-				var array2= arrayDeCadenas[index].split(separador)
-				pdf.push(array2[1])
+				}
+				
 			}
-			//console.log(pdf)
-			var lista=""
-			for (let index = 0; index < pdf.length; index++) {
-				lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+pdf[index]+"' class='link-primary'>PDF "+(index+1)+"</a></td></tr>"
+		}
+		async function destinatario_arbol(){
+			var id='{{$midata->id}}'
+			var detalle= await axios("{{setting('admin.url')}}api/find/documento/detalle/"+id)
+			for (let index = 0; index < detalle.data.length; index++) {
+				if (detalle.data[index].destinatario_externo) {
+					var user= await axios("{{setting('admin.url')}}api/find/persona/"+detalle.data[index].destinatario_externo)
+					var lista=""
+					lista+= user.data.display
+					$('#destinatario_arbol_'+detalle.data[index].id+'').html(lista)
+				}
+				else{
+					var user= await axios("{{setting('admin.url')}}api/find/user/"+detalle.data[index].destinatario_interno)
+					var lista=""
+					lista+= user.data.name
+					$('#destinatario_arbol_'+detalle.data[index].id+'').html(lista)
+				}
 			}
-			$('#pdfs_arbol').html(lista)
 		}
 
 		async function array_imagenes(id){
 			var documento= await axios("{{setting('admin.url')}}api/find/documento/"+id)
-			var images= []
-			var separador=","
-			var arrayDeCadenas = documento.data.archivo.split(separador);
-			// console.log(pdf)
-			// console.log(images)
-			//console.log(arrayDeCadenas[0])
-			var separador='"'
-			for (let index = 0; index < arrayDeCadenas.length; index++) {
-				var array2= arrayDeCadenas[index].split(separador)
-				images.push(array2[1])
+			if (documento.data.archivo) {
+				var images= []
+				var separador=","
+				var arrayDeCadenas = documento.data.archivo.split(separador);
+				// console.log(pdf)
+				// console.log(images)
+				//console.log(arrayDeCadenas[0])
+				var separador='"'
+				for (let index = 0; index < arrayDeCadenas.length; index++) {
+					var array2= arrayDeCadenas[index].split(separador)
+					images.push(array2[1])
+				}
+				//console.log(images)
+				
+				// console.log(documento.data.archivo)
+				return images;
 			}
-			//console.log(images)
+			else{
+				return false;
+			}
 			
-			// console.log(documento.data.archivo)
-			return images;
 		}
 		async function array_pdfs(id){
 			var documento= await axios("{{setting('admin.url')}}api/find/documento/"+id)
-			var pdf= []
-			var separador=","
-			var arrayDeCadenas = documento.data.pdf.split(separador);
-			var separador=':'
-			for (let index = 0; index < arrayDeCadenas.length; index++) {
-				if (index%2==0) {
-					var array2= arrayDeCadenas[index].split(separador)
-					var separador='"'
-					var array3= array2[1].split(separador)
-					pdf.push(array3[1])
+			if (documento.data.pdf>2) {
+				var pdf= []
+				var separador=","
+				var arrayDeCadenas = documento.data.pdf.split(separador);
+				var separador=':'
+				for (let index = 0; index < arrayDeCadenas.length; index++) {
+					if (index%2==0) {
+						var array2= arrayDeCadenas[index].split(separador)
+						var separador='"'
+						var array3= array2[1].split(separador)
+						pdf.push(array3[1])
+					}
 				}
+				return pdf;
+			}
+			else{
+				return false;
 			}
 			
-			
-			return pdf;
 		}
 
 		//Cargar Destinatarios

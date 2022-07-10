@@ -13,6 +13,8 @@ use App\Gaceta;
 use App\CatGaceta;
 use App\DocumentoDetalle;
 use App\RelDerivDoc;
+use App\Pregunta;
+use App\Concejale;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -36,6 +38,11 @@ Route::get('users', function () {
 //Buscar un Usuario
 Route::get('find/user/{id}', function($id){
     return User::find($id);
+});
+
+//Buscar una Persona
+Route::get('find/persona/{id}', function($id){
+    return Persona::find($id);
 });
 
 //Todas las personas
@@ -146,6 +153,7 @@ Route::get('images/{id}', function($id){
 Route::get('convocatorias', function () {
     return Convocatoria::with('categoria')->orderBy('name', 'asc')->get();
 });
+
 Route::get('catconvocatoria/', function(){
     return CatConvocatoria::all();
 });
@@ -154,6 +162,9 @@ Route::get('convocatorias/filtro/{categoria_id}/{gestion}', function($categoria_
     return Convocatoria::where('categoria_id', $categoria_id)->where('gestion', $gestion)->orderBy('name', 'asc')->with('categoria')->get();
 });
 
+Route::get('5convocatorias', function () {
+    return Convocatoria::with('categoria')->orderBy('created_at', 'asc')->limit(5)->get();
+});
 
 //Gacetas
 Route::get('gacetas', function () {
@@ -173,12 +184,16 @@ Route::post('gacetas/buscar', function(Request $request){
     return $result;
 });
 
-Route::get('gacetas/totales', function () {
-    $total = Gaceta::count();
-    return response()->json(['total' => $total]);
+Route::get('5gacetas', function () {
+    return Gaceta::with('categoria')->orderBy('name', 'desc')->limit(5)->get();
 });
 
-//Restablecer Password
+Route::get('gacetas', function () {
+    return Gaceta::with('categoria')->orderBy('name', 'desc')->limit(15)->get();
+});
+
+
+//Restablecer Password-------
 Route::post('credenciales', function(Request $request){
     $user=User::where('phone',$request->phone)->first();
     if ($user!=null) {
@@ -204,4 +219,15 @@ Route::post('save/rel/deriv', function(Request $request){
 //Get Documento DetalLe
 Route::get('find/documento/detalle/{id}', function($id){
     return DocumentoDetalle::where('documento_id',$id)->get();
+});
+
+//preguntas
+Route::get('preguntas', function () {
+    return Pregunta::orderBy('created_at', 'desc')->get();
+});
+
+
+//Concejales ---------
+Route::get('concejales', function () {
+    return Concejale::orderBy('created_at', 'desc')->get();
 });

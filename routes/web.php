@@ -70,6 +70,12 @@ Route::get('/reglamento-general', function () {
     return view('paginas.reglamento-general', compact('reglamento'));
 });
 
+Route::get('miconcejal/{id}', function ($id) {
+    // return $id;
+    $concejal = App\Concejale::find($id);
+    return view('paginas.miconcejal', compact('concejal'));
+});
+
 // auth -------
 Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
@@ -136,11 +142,12 @@ Route::post('/respuesta/documento', function (Request $request) {
     $doc_detalle = App\DocumentoDetalle::create([
         'documento_id'=>$request->documento_id,
         'user_id'=>$request->user_id,
-        'mensaje'=>$request->mensaje_respuesta,
+        'mensaje'=>$request->mensaje_respuesta_respondido,
         'image'=>json_encode($vector_img), 
         'pdf'=>json_encode($vector_pdf),
         'destinatario_interno'=>$request->destinatario_interno,
-        'destinatario_externo'=>$request->destinatario_externo
+        'destinatario_externo'=>$request->destinatario_externo,
+        'estado_id'=>$request->estado_id
     ]);
 
     return redirect('admin/documentos');
