@@ -121,10 +121,15 @@ Route::group(['prefix' => 'admin'], function () {
 });
 
 Route::post('/respuesta/documento', function (Request $request) {
+    class Archivo{
+        public $download_link;
+        public $original_name;
+    }
     //return $documento_id;
     $imagenes = $request->file('images_respuesta');
     $vector_img=[];
     if ($imagenes!= null) {
+        $contador=0;
         foreach($imagenes as $file){
             $newfile =  Storage::disk('public')->put('documentos', $file);
             array_push($vector_img, $newfile);
@@ -133,9 +138,14 @@ Route::post('/respuesta/documento', function (Request $request) {
     $vector_pdf=[];
     $pdfs = $request->file('pdf_respuesta');
     if ($pdfs!=null) {
+        $contador=0;
         foreach($pdfs as $file){
             $newfile =  Storage::disk('public')->put('documentos', $file);
-            array_push($vector_pdf, $newfile);
+            $name = $file->getClientOriginalName();
+            $vector_pdf[$contador] = new Archivo();
+            $vector_pdf[$contador]->download_link=$newfile;
+            $vector_pdf[$contador]->original_name=$name;
+            $contador+=1;
         }
     }
 
@@ -147,9 +157,60 @@ Route::post('/respuesta/documento', function (Request $request) {
         'pdf'=>json_encode($vector_pdf),
         'destinatario_interno'=>$request->destinatario_interno,
         'destinatario_externo'=>$request->destinatario_externo,
-        'estado_id'=>$request->estado_id
+        'estado_id'=>$request->estado_id_responder
     ]);
 
-    return redirect('admin/documentos');
+    $documento= App\Documento::find($request->documento_id);
+    $documento->estado_id=$request->estado_id_responder;
+    $documento->save();
+
+    return view('documentos.respuesta', compact('doc_detalle'));
     
 })->name('respuesta_documento');
+
+Route::post('/derivar/documento', function(Request $request){
+    $rel_deriv_doc= App\RelDerivDoc::create([
+        'documento_id'=>$request->documento_id_derivacion,
+        'user_id'=>$request->user_id_derivacion,
+    ]);
+    $doc_detalle= App\DocumentoDetalle::create([
+        'documento_id' => $request->documento_id_derivacion,
+        'user_id' => $request->user_id_derivacion,
+        'mensaje' => $request->mensaje_respuesta_derivado,
+        'destinatario_interno' => $request->destinatario_id_derivacion,
+        'estado_id'=>$request->estado_id_derivacion,
+        'image'=>'[]', 
+        'pdf'=>'[]'
+    ]);
+    $documento = App\Documento::find($request->documento_id_derivacion);
+    $documento->estado_id = $request->estado_id_derivacion;
+    $documento->destinatario_id = $request->destinatario_id_derivacion;
+    $documento->save();
+    
+    return view('documentos.derivacion', compact('doc_detalle'));
+    
+})->name('derivar_documento');
+
+Route::post('/rechazar/documento', function(Request $request){
+    $doc_detalle= App\DocumentoDetalle::create([
+        'documento_id' => $request->documento_id_rechazo,
+        'user_id' => $request->user_id_rechazo,
+        'mensaje' => $request->mensaje_respuesta_rechazado,
+        'estado_id'=>$request->estado_id_rechazo,
+        'destinatario_interno' => $request->destinatario_interno_rechazo,
+        'destinatario_externo' => $request->destinatario_externo_rechazo,
+        'image'=>'[]', 
+        'pdf'=>'[]'
+    ]);
+    $documento = App\Documento::find($request->documento_id_rechazo);
+    $documento->estado_id = $request->estado_id_rechazo;
+    $documento->save();
+    
+    return view('documentos.rechazar', compact('doc_detalle'));
+    
+})->name('rechazar_documento');
+
+Route::get('test/derivacion', function(){
+
+    return view('documentos.derivacion');
+});

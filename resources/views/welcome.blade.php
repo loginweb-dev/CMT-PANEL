@@ -99,7 +99,7 @@
               </div>
 
               {{-- <iframe src="https://www.google.com.bo/maps/place/Hotel+Campanario+Trinidad/@-14.8357067,-64.9065895,18z/data=!4m8!3m7!1s0x93dd6fd58a49d12f:0xf78237184d966cfb!5m2!4m1!1i2!8m2!3d-14.8354686!4d-64.9058211?hl=es" frameborder="0" style="border:0; width: 100%; height: 290px;" allowfullscreen></iframe> --}}
-              <div class="mapouter"><div class="gmap_canvas"><iframe width="600" height="500" id="gmap_canvas" src="https://maps.google.com/maps?q=trinidad%20beni&t=&z=17&ie=UTF8&iwloc=&output=embed" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe><a href="https://123movies-a.com"></a><br><style>.mapouter{position:relative;text-align:right;height:300px;width:100%;}</style><a href="https://www.embedgooglemap.net">embed map in gmail</a><style>.gmap_canvas {overflow:hidden;background:none!important;height:300px;width:100%;}</style></div></div>
+              {{-- <div class="mapouter"><div class="gmap_canvas"><iframe width="600" height="500" id="gmap_canvas" src="https://maps.google.com/maps?q=trinidad%20beni&t=&z=17&ie=UTF8&iwloc=&output=embed" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe><a href="https://123movies-a.com"></a><br><style>.mapouter{position:relative;text-align:right;height:300px;width:100%;}</style><a href="https://www.embedgooglemap.net">embed map in gmail</a><style>.gmap_canvas {overflow:hidden;background:none!important;height:300px;width:100%;}</style></div></div> --}}
             </div>
 
           </div>

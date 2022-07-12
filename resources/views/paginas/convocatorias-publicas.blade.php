@@ -92,25 +92,28 @@
 
 	$('#mibuscar').keyup(async function (e) { 
 		if (e.keyCode == 13) {
-		  var result = await axios.post('https://panel.cmt.gob.bo/api/gacetas/buscar', {criterio: this.value})
-		  console.log(result.data)
+		  var result = await axios.post('https://cmt.gob.bo/api/convocatorias/buscar', {criterio: this.value})
+		//   console.log(result.data)
 		  $("#mitable tbody tr").remove();
+		  toastr.success('Resultados: '+result.data.length)
 		  for (let index = 0; index < result.data.length; index++) {
-			$("#mitable").append("<tr id="+result.data[index].id+"><td>"+result.data[index].name+"</td><td>"+result.data[index].categoria.name+"</td><td>"+result.data[index].gestion+"</td><td><a class='btn-boton' href='https://panel.cmt.gob.bo/storage/"+result.data[index].file+"'>Ver</a></td></tr>")
+			$("#mitable").append("<tr id="+result.data[index].id+"><td>"+result.data[index].name+"</td><td>"+result.data[index].categoria.name+"</td><td>"+result.data[index].gestion+"</td><td><a class='btn-boton' href='https://cmt.gob.bo/storage/"+result.data[index].file+"'>Ver</a></td></tr>")
 		  }
 		}
 	  });
 	  async function cargar() {
-		var conv = await axios('https://panel.cmt.gob.bo/api/convocatorias')
-		// console.log(conv.data)
+		var conv = await axios('https://cmt.gob.bo/api/convocatorias')
 		$("#mitable tbody tr").remove();
 		for (let index = 0; index < conv.data.length; index++) {
-		  $("#mitable").append("<tr id="+conv.data[index].id+"><td>"+conv.data[index].name+"</td><td>"+conv.data[index].categoria.name+"</td><td>"+conv.data[index].gestion+"</td><td><a class='btn-boton' href='https://panel.cmt.gob.bo/storage/"+conv.data[index].file+"'>Ver</a></td></tr>")
+		  $("#mitable").append("<tr id="+conv.data[index].id+"><td>"+conv.data[index].name+"</td><td>"+conv.data[index].categoria.name+"</td><td>"+conv.data[index].gestion+"</td><td><a class='btn-boton' href='https://cmt.gob.bo/storage/"+conv.data[index].file+"'>Ver</a></td></tr>")
 		}
+		$("#mitable").append("<tr><td colspan='4'>Mostrando los Ultimos "+conv.data.length+" Registros</td></tr>")
+		var totales = await axios('https://cmt.gob.bo/api/convocatorias/totales')
+		$("#mitable").append("<tr><td colspan='4'>Total Registros "+totales.data.total+"</td></tr>")
 	  }
   
 	  async function categorias() {
-		var catg = await axios('https://panel.cmt.gob.bo/api/catconvocatoria')
+		var catg = await axios('https://cmt.gob.bo/api/catconvocatoria')
 		$('#category').append($('<option>', {
 			value: 0,
 			text: 'Elige una Categoria'
@@ -127,10 +130,18 @@
 		$("#mitable tbody tr").remove();
 		var categoria = $("#category").val();
 		var gestion = $("#gestion").val();
-		var result = await axios('https://panel.cmt.gob.bo/api/convocatorias/filtro/'+categoria+'/'+gestion)
+		var result = await axios('https://cmt.gob.bo/api/convocatorias/filtro/'+categoria+'/'+gestion)
+		toastr.success('Resultados: '+result.data.length)
 		for (let index = 0; index < result.data.length; index++) {
 		  $("#mitable").append("<tr id="+result.data[index].id+"><td>"+result.data[index].name+"</td><td>"+result.data[index].categoria.name+"</td><td>"+result.data[index].gestion+"</td><td><a class='btn-boton' href='https://panel.cmt.gob.bo/storage/"+result.data[index].file+"'>Ver</a></td></tr>")
 		}
 	  }
+	  $('#category').change(function (e) { 
+		e.preventDefault();
+
+		if (this.value) {
+			cargar()
+		}
+	});
   </script>
 @endsection

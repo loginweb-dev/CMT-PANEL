@@ -345,7 +345,7 @@
             e.preventDefault();
             var msg = $("#chat-input").val();
             if (msg == '') {
-              toastr.error('Ingresa una opcion o un texto valido')
+              toastr.error('😕 Ingresa una opcion o un texto valido')
               $(".chat-logs").stop().animate({ scrollTop: $(".chat-logs")[0].scrollHeight}, 1000);
               return true;
             }
@@ -480,18 +480,31 @@
                     str += "          </ul>dale click para mas info.<\/div>";
                     str += "        <\/div>";
                     $(".chat-logs").append(str);
-                  }else if (msg == 'A4'|| msg == 'a4') { //5 convocatorias
-                    // var result = await axios('https://cmt.gob.bo/api/5convocatorias'); 
+                  }else if (msg == 'A4'|| msg == 'a4') { // Login
                     var str="";
                     str += "<div class=\"chat-msg user\">";
                     str += "          <span class=\"msg-avatar\">";
                     str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
                     str += "          <\/span>";
                     str += "          <div class=\"cm-msg-text\">";
-                    str += misession.name+", te mandamos tus credenciales a tu whatsapp, revisalo porfavor.<br><ul>"
+                    str += misession.name+", te mandamos tus credenciales a tu whatsapp, revisalo porfavor.<br>"
                     str += "         <\/div>";
                     str += "        <\/div>";
                     $(".chat-logs").append(str);
+                  }else if (msg == 'A5'|| msg == 'a5') { // Login
+                    var str="";
+                    str += "<div class=\"chat-msg user\">";
+                    str += "          <span class=\"msg-avatar\">";
+                    str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
+                    str += "          <\/span>";
+                    str += "          <div class=\"cm-msg-text\">";
+                    str += "Vuelve pronto, "+misession.name
+                    str += "         <\/div>";
+                    str += "        <\/div>";
+                    $(".chat-logs").append(str);
+                    localStorage.removeItem('michat')
+                    localStorage.removeItem('miregister') 
+                    location.reload()
                   }else{
                     var str="";
                     str += "<div class=\"chat-msg user\">";
@@ -499,11 +512,11 @@
                     str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
                     str += "          <\/span>";
                     str += "          <div class=\"cm-msg-text\">";
-                    str += misession.name+", Ingresa una opcion valida. ejemplo: Hola <br>"
+                    str += misession.name+", 😕 Ingresa una opcion valida. ejemplo: Hola <br>"
                     str += "          <\/div>";
                     str += "        <\/div>";
                     $(".chat-logs").append(str);
-                    toastr.error('Ingresa una opcion valida. ejemplo: Hola')
+                    toastr.error('😕 Ingresa una opcion valida. ejemplo: Hola')
                   }
                   break;
             }
@@ -512,7 +525,7 @@
         })
 
         $("#chat-circle").click(async function() {
-          toastr.success('Iniciando Chats')
+          toastr.success('😃 Iniciando Chats')
           var misession = localStorage.getItem('michat') ? JSON.parse(localStorage.getItem('michat')) : []
           var result = await axios('https://cmt.gob.bo/api/preguntas'); 
           var str="";
@@ -534,7 +547,7 @@
         })
 
         $(".chat-box-toggle").click(function() {
-          toastr.success('Cerrando Chats')
+          toastr.error('😔 Cerrando Chats')
           $("#chat-circle").toggle('scale')
           $(".chat-box").toggle('scale')
         })

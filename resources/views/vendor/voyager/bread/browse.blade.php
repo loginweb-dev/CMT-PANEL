@@ -144,7 +144,7 @@
                                                         array_push($deriv,$item->user_id);
                                                     }
                                                 @endphp
-                                                @if ($data->destinatario_id == Auth::user()->id AND $data->estado_id == 2)
+                                                @if ($data->destinatario_id == Auth::user()->id AND $data->estado_id >= 2)
                                                     <tr>
                                                         @if($showCheckboxColumn)
                                                             <td>

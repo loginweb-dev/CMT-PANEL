@@ -68,7 +68,7 @@
 	a request to the API and displaying the results in the table. */
 	$('#mibuscar').keyup(async function (e) {
 		if (e.keyCode == 13) {
-		  var result = await axios.post('https://panel.cmt.gob.bo/api/gacetas/buscar', {criterio: this.value})
+		  var result = await axios.post('https://cmt.gob.bo/api/gacetas/buscar', {criterio: this.value})
 		  $("#mitable tbody tr").remove();
 		  toastr.success('Resultados: '+result.data.length)
 		  for (let index = 0; index < result.data.length; index++) {
@@ -83,13 +83,13 @@
  	* through the response and adds a new row for each item in the response
  	*/
 	async function cargar() {
-		var result = await axios('https://panel.cmt.gob.bo/api/gacetas')
+		var result = await axios('https://cmt.gob.bo/api/gacetas')
 		$("#mitable tbody tr").remove();
 		for (let index = 0; index < result.data.length; index++) {
-		  $("#mitable").append("<tr id="+result.data[index].id+"><td>"+result.data[index].name+"</td><td>"+result.data[index].categoria.name+"</td><td>"+result.data[index].gestion+"</td><td><a class='btn-boton' href='https://panel.cmt.gob.bo/storage/"+result.data[index].file+"'>Ver</a></td></tr>")
+		  $("#mitable").append("<tr id="+result.data[index].id+"><td>"+result.data[index].name+"</td><td>"+result.data[index].categoria.name+"</td><td>"+result.data[index].gestion+"</td><td><a class='btn-boton' href='https://cmt.gob.bo/storage/"+result.data[index].file+"'>Ver</a></td></tr>")
 		}
 		$("#mitable").append("<tr><td colspan='4'>Mostrando los Ultimos "+result.data.length+" Registros</td></tr>")
-		var totales = await axios('https://panel.cmt.gob.bo/api/gacetas/totales')
+		var totales = await axios('https://cmt.gob.bo/api/gacetas/totales')
 		$("#mitable").append("<tr><td colspan='4'>Total Registros "+totales.data.total+"</td></tr>")
 	}
 	
@@ -97,7 +97,7 @@
 	* It takes the data from the API and adds it to the select element
 	*/
 	async function categorias() {
-		var catg = await axios('https://panel.cmt.gob.bo/api/catgacetas')
+		var catg = await axios('https://cmt.gob.bo/api/catgacetas')
 		$('#category').append($('<option>', {
 			value: 0,
 			text: 'Elige una Categoria'
@@ -116,10 +116,10 @@
 		$("#mitable tbody tr").remove();
 		var categoria = $("#category").val();
 		var gestion = $("#gestion").val();
-		var result = await axios.post('https://panel.cmt.gob.bo/api/gacetas/filtro', {categoria: categoria, gestion: gestion})
+		var result = await axios.post('https://cmt.gob.bo/api/gacetas/filtro', {categoria: categoria, gestion: gestion})
 		toastr.success('Resultados: '+result.data.length)
 		for (let index = 0; index < result.data.length; index++) {
-		  $("#mitable").append("<tr id="+result.data[index].id+"><td>"+result.data[index].name+"</td><td>"+result.data[index].categoria.name+"</td><td>"+result.data[index].gestion+"</td><td><a class='btn-boton' href='https://panel.cmt.gob.bo/storage/"+result.data[index].file+"'>Ver</a></td></tr>")
+		  $("#mitable").append("<tr id="+result.data[index].id+"><td>"+result.data[index].name+"</td><td>"+result.data[index].categoria.name+"</td><td>"+result.data[index].gestion+"</td><td><a class='btn-boton' href='https://cmt.gob.bo/storage/"+result.data[index].file+"'>Ver</a></td></tr>")
 		}
 	}
 

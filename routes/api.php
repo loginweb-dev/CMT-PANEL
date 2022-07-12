@@ -92,52 +92,77 @@ Route::get('derivar/{midata}', function ($midata) {
     return $documento;
 });
 
-//Responder
-Route::post('responder', function (Request $request) {
-    $documento = Documento::find($request->documento_id);
-    $documento->estado_id = 3;
-    $documento->save();
-    $detalle = DocumentoDetalle::create([
-        'documento_id' => $request->documento_id,
-        'user_id' => $request->user_id,
-        'mensaje' => $request->mensaje
-    ]);
-    return true;
-});
+// //Responder
+// Route::post('responder', function (Request $request) {
+//     $documento = Documento::find($request->documento_id);
+//     $documento->estado_id = 3;
+//     $documento->save();
+//     $detalle = DocumentoDetalle::create([
+//         'documento_id' => $request->documento_id,
+//         'user_id' => $request->user_id,
+//         'mensaje' => $request->mensaje
+//     ]);
+//     return true;
+// });
 //Rechazar
-Route::post('rechazar', function (Request $request) {
-    $documento = Documento::find($request->documento_id);
-    $documento->estado_id = 4;
-    $documento->save();
-    $detalle = DocumentoDetalle::create([
-        'documento_id' => $request->documento_id,
-        'user_id' => $request->user_id,
-        'mensaje' => $request->mensaje
-    ]);
-    return true;
-});
-Route::post('derivar2', function (Request $request) {
-    $documento = Documento::find($request->documento_id);
-    $documento->estado_id = 2;
-    $documento->destinatario_id = $request->destinatario;
-    $documento->save();
-    $detalle = DocumentoDetalle::create([
-        'documento_id' => $request->documento_id,
-        'user_id' => $request->user_id,
-        'mensaje' => $request->mensaje,
-        'destinatario' => $request->destinatario
-    ]);
-    return true;
-});
+// Route::post('rechazar', function (Request $request) {
+//     $documento = Documento::find($request->documento_id);
+//     $documento->estado_id = 4;
+//     $documento->save();
+//     $detalle = DocumentoDetalle::create([
+//         'documento_id' => $request->documento_id,
+//         'user_id' => $request->user_id,
+//         'mensaje' => $request->mensaje
+//     ]);
+//     return true;
+// });
+// Route::post('derivar2', function (Request $request) {
+//     $documento = Documento::find($request->documento_id);
+//     $documento->estado_id = 2;
+//     $documento->destinatario_id = $request->destinatario;
+//     $documento->save();
+//     $detalle = DocumentoDetalle::create([
+//         'documento_id' => $request->documento_id,
+//         'user_id' => $request->user_id,
+//         'mensaje' => $request->mensaje,
+//         'destinatario' => $request->destinatario
+//     ]);
+//     return true;
+// });
 Route::post('registrar/first/detalle', function (Request $request) {
+  
     $detalle = DocumentoDetalle::create([
         'documento_id' => $request->documento_id,
         'user_id' => $request->user_id,
         'mensaje' => $request->mensaje,
-        'destinatario' => $request->destinatario
+        'destinatario_interno' => $request->destinatario_interno,
+        'estado_id'=>2,
+        'image'=>$request->archivo ? $request->archivo: '[]', 
+        'pdf'=>$request->pdf ? $request->pdf: '[]', 
     ]);
 });
 
+Route::post('obtener/pdf/documento', function(Request $request){
+    $doc= Documento::find($request->id);
+    $doc2= json_decode($doc->pdf);
+    return $doc2;
+});
+Route::post('obtener/img/documento', function(Request $request){
+    $doc= Documento::find($request->id);
+    $doc2= json_decode($doc->archivo);
+    return $doc2;
+});
+
+Route::post('obtener/pdf/arbol', function(Request $request){
+    $doc= DocumentoDetalle::find($request->id);
+    $doc2= json_decode($doc->pdf);
+    return $doc2;
+});
+Route::post('obtener/img/arbol', function(Request $request){
+    $doc= DocumentoDetalle::find($request->id);
+    $doc2= json_decode($doc->image);
+    return $doc2;
+});
 
 
 // save Documento ajax
@@ -151,7 +176,7 @@ Route::get('images/{id}', function($id){
 
 //Convocatorias
 Route::get('convocatorias', function () {
-    return Convocatoria::with('categoria')->orderBy('name', 'asc')->get();
+    return Convocatoria::with('categoria')->orderBy('name', 'asc')->limit(15)->get();
 });
 
 Route::get('catconvocatoria/', function(){
@@ -165,6 +190,11 @@ Route::get('convocatorias/filtro/{categoria_id}/{gestion}', function($categoria_
 Route::get('5convocatorias', function () {
     return Convocatoria::with('categoria')->orderBy('created_at', 'asc')->limit(5)->get();
 });
+
+Route::get('convocatorias/totales', function () {
+    return response()->json(['total' => Convocatoria::count()]);
+});
+
 
 //Gacetas
 Route::get('gacetas', function () {
@@ -188,8 +218,8 @@ Route::get('5gacetas', function () {
     return Gaceta::with('categoria')->orderBy('name', 'desc')->limit(5)->get();
 });
 
-Route::get('gacetas', function () {
-    return Gaceta::with('categoria')->orderBy('name', 'desc')->limit(15)->get();
+Route::get('gacetas/totales', function () {
+     return response()->json(['total' => Gaceta::count()]);
 });
 
 
@@ -221,6 +251,10 @@ Route::get('find/documento/detalle/{id}', function($id){
     return DocumentoDetalle::where('documento_id',$id)->get();
 });
 
+//Get  DetalLe
+Route::get('find/detalle/{id}', function($id){
+    return DocumentoDetalle::find($id);
+});
 //preguntas
 Route::get('preguntas', function () {
     return Pregunta::orderBy('created_at', 'desc')->get();

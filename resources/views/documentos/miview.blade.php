@@ -6,10 +6,19 @@
 @php
 	$midata = App\Documento::where('id', $id)->first();
 	$copia = App\RelUserDoc::where('documento_id', $midata->id)->get();
-	$derivadores = App\RelDerivDoc::where('documento_id', $midata->id)->get();
+	$derivadores=App\RelDerivDoc::where('documento_id', $midata->id)->get();
 	$remitente_interno= $midata->remitente_interno ? $midata->remitente_interno->id : null ;
 	$remitente_externo= $midata->remitente_externo ? $midata->remitente_externo->id : null ;
+	
+	$copias=[];
+	foreach ($copia as $item) {
+		array_push($copias,$item->user_id);
+	}
 
+	$deriv=[];
+	foreach ($derivadores as $item) {
+		array_push($deriv,$item->user_id);
+	}
 @endphp
 
 @section('page_header')
@@ -25,54 +34,31 @@
 			{{-- <code>
 				{{ $midata }}
 			</code> --}}
+			@if($midata->estado_id!=1)
+				@if(Auth::user()->role_id == 3 OR Auth::user()->role_id == 1 OR Auth::user()->id == $midata->editor_id OR in_array(Auth::user()->id, $copias) OR in_array(Auth::user()->id, $deriv) OR $midata->destinatario_id== Auth::user()->id)
+					<div class="col-sm-6 form-group">		
+						<div class="col-sm-12 form-group">
+							<a data-toggle="modal" data-target="#arbol_detalle" class="btn btn-primary">Flujograma de Correspondencia</a>
+						</div>
+					</div>
+				@endif
+			@endif
 			@switch($midata->estado_id)
 				@case(1)
 					@if($midata->editor_id== Auth::user()->id)
-						<a href="#" onclick="derivar('{{ $midata->id }}')" class="btn btn-dark">Derivar</a>
+						{{-- <a  onclick="derivar('{{ $midata->id }}')" class="btn btn-dark">Derivar</a> --}}
+						<button onclick="derivar('{{ $midata->id }}')" class="btn btn-dark">Derivar <i class="voyager-forward"></i></button>
+
 					@endif
 					@break
 				@case(2)
 					{{-- <a href="#" onclick="derivar_a_terceros('{{$midata->id}}')"data-toggle="modal" data-target="#derivar_a_terceros" class="btn btn-dark">Derivar a Otros</a> --}}
-					<br>
+						
 						@if($midata->destinatario_id== Auth::user()->id)
 							<div class="col-sm-6 form-group">
-								{{-- <div class="col-sm-12 form-group">
-									Mensaje Recibido: <p>{{ $midata->message }}</p>
-									<textarea class="form-control" name="mensaje_respuesta"></textarea>
-								</div>
-
 								<div class="col-sm-12 form-group">
-									<label for="">Image</label>
-									<input type="file" name="" id="images_respuesta" class="form-control">
+									<a data-toggle="modal" data-target="#AccionesDestinatario" class="btn btn-dark">Acciones</a>
 								</div>
-								<div class="col-sm-12 form-group">
-									<label for="">PDF</label>
-									<input type="file" name="" id="pdf_respuesta" class="form-control">
-								</div> --}}
-								<div class="col-sm-12 form-group">
-									<a href="#" onclick="#" data-toggle="modal" data-target="#arbol_detalle" class="btn btn-primary">Árbol Detalles</a>
-								</div>
-							</div>
-							<div class="col-sm-6 form-group">
-								{{-- <div class="col-sm-12 form-group">
-									<label for="usuario_derivar">Usuarios</label>
-									<select class="form-control" name="usuario_derivar" id="usuario_derivar"></select>
-								</div>
-								<div class="col-sm-12 form-group">
-									<a href="#" onclick="derivar_simple('{{$midata->id}}')" class="btn btn-success">Derivar</a>
-								</div>
-								<div class="col-sm-12 form-group">
-									<a href="#" onclick="responder('{{ $midata->id }}')" class="btn btn-primary">Responder</a>
-								</div>
-
-								<div class="col-sm-12 form-group">
-									<a href="#" onclick="derivar('{{ $midata->id }}')" class="btn btn-danger">Rechazar</a>
-								</div> --}}
-								<div class="col-sm-12 form-group">
-									<a href="#" onclick="#" data-toggle="modal" data-target="#AccionesDestinatario" class="btn btn-dark">Acciones</a>
-								</div>
-								
-								
 							</div>
 						@endif
 
@@ -309,12 +295,12 @@
 
                             <div role="tabpanel" class="tab-pane active" id="responder">
                                 <div class="row">
-									<form action="{{route("respuesta_documento")}}" method="POST" enctype="multipart/form-data">
+									<form action="{{route("respuesta_documento")}}" id="form_responder" method="POST" enctype="multipart/form-data">
 										{{ csrf_field() }}
 										<div class="col-sm-12 form-group">
 											{{-- Mensaje Recibido: <p>{{ $midata->message }}</p> --}}
 											<label for="mensaje_respuesta">Escribe un Mensaje</label>
-											<textarea class="form-control" name="mensaje_respuesta_respondido" required></textarea>
+											<textarea class="form-control" name="mensaje_respuesta_respondido" id="mensaje_respuesta_respondido" required ></textarea>
 										</div>
 										<input type="text" name="user_id" value="{{Auth::user()->id}}" hidden>
 										<input type="text" name="documento_id" value="{{$midata->id}}" hidden>
@@ -329,10 +315,10 @@
 										</div>
 										<div class="col-sm-12 form-group">
 											<label for="">PDF</label>
-											<input type="file" name="pdf_respuesta[]" id="pdf_respuesta" class="form-control" accept="application/pdf,application/vnd.ms-excel" multiple>
+											<input type="file" name="pdf_respuesta[]" id="pdf_respuesta" class="form-control" accept="application/pdf, application/xlsx" multiple>
 										</div>
 										<div class="col-sm-12 form-group">
-											<button type="submit" class="btn btn-primary" > Responder <i class="voyager-paper-plane"></i> </button>
+											<button type="submit" onclick="deshabilitar_botones()" id="button_respuesta" class="btn btn-primary" > Responder <i class="voyager-paper-plane"></i> </button>
 											{{-- <a href="#" onclick="responder('{{ $midata->id }}')" class="btn btn-primary">Responder</a> --}}
 										</div>
 									</form>
@@ -341,32 +327,51 @@
                                 </div>
                             </div>
                             <div role="tabpanel" class="tab-pane" id="derivar">
-
                                 <div class="row">
-                                    <div class="col-sm-12 form-group">
-										{{-- Mensaje Recibido: <p>{{ $midata->message }}</p> --}}
-										<label for="mensaje_respuesta">Escribe un Mensaje</label>
-										<textarea class="form-control" name="mensaje_respuesta_derivado" required></textarea>
-									</div>
-									<div class="col-sm-12 form-group">
-										<label for="usuario_derivar">Usuarios</label>
-										<select class="form-control" name="usuario_derivar" id="usuario_derivar"></select>
-									</div>
-									<div class="col-sm-12 form-group">
-										<a href="#" onclick="derivar_simple('{{$midata->id}}')" class="btn btn-success">Derivar <i class="voyager-forward"></i></a>
-									</div>
+									<form action="{{route("derivar_documento")}}" id="form_derivar" method="POST" enctype="multipart/form-data">
+										{{ csrf_field() }}
+										<div class="col-sm-12 form-group">
+											{{-- Mensaje Recibido: <p>{{ $midata->message }}</p> --}}
+											<label for="mensaje_respuesta">Escribe un Mensaje</label>
+											<textarea class="form-control" name="mensaje_respuesta_derivado" id="mensaje_respuesta_derivado" required ></textarea>
+										</div>
+										<input type="text" name="documento_id_derivacion" value="{{$midata->id}}" hidden>
+										<input type="text" name="user_id_derivacion" value="{{Auth::user()->id}}" hidden>
+										<input type="text" name="estado_id_derivacion" value="2" hidden>
+
+										<div class="col-sm-12 form-group">
+											<label for="destinatario_id_derivacion">Usuarios</label>
+											<select class="form-control" name="destinatario_id_derivacion" id="destinatario_id_derivacion" ></select>
+										</div>
+										<div class="col-sm-12 form-group">
+											<button type="submit" onclick="deshabilitar_botones()" id="button_derivacion" class="btn btn-success">Derivar <i class="voyager-forward"></i></button>
+										</div>
+
+									</form>
+                                    
                                 </div>
                             </div>
                             <div role="tabpanel" class="tab-pane" id="rechazar">
                                 <div class="row">
-									<div class="col-sm-12 form-group">
-										{{-- Mensaje Recibido: <p>{{ $midata->message }}</p> --}}
-										<label for="mensaje_respuesta">Escribe un Mensaje</label>
-										<textarea class="form-control" name="mensaje_respuesta_rechazado" required></textarea>
-									</div>
-									<div class="col-sm-12 form-group">
-										<a href="#" onclick="rechazar('{{ $midata->id }}')" class="btn btn-danger">Rechazar <i class="voyager-x"></i></a>
-									</div>
+									<form action="{{route("rechazar_documento")}}" id="form_rechazar" method="POST" enctype="multipart/form-data">
+										{{ csrf_field() }}										
+										<div class="col-sm-12 form-group">
+											{{-- Mensaje Recibido: <p>{{ $midata->message }}</p> --}}
+											<label for="mensaje_respuesta">Escribe un Mensaje</label>
+											<textarea class="form-control" name="mensaje_respuesta_rechazado" id="mensaje_respuesta_rechazado" required ></textarea>
+										</div>
+										<input type="text" name="documento_id_rechazo" value="{{$midata->id}}" hidden>
+										<input type="text" name="user_id_rechazo" value="{{Auth::user()->id}}" hidden>
+										<input type="text" name="estado_id_rechazo" value="4" hidden>
+										<input type="text" name="destinatario_interno_rechazo" value="{{$remitente_interno}}" hidden>
+										<input type="text" name="destinatario_externo_rechazo" value="{{$remitente_externo}}" hidden>
+
+
+										<div class="col-sm-12 form-group">
+											<button type="submit" onclick="deshabilitar_botones()" id="button_rechazo" class="btn btn-danger">Rechazar <i class="voyager-x"></i></button>
+										</div>
+									</form>
+									
                                 </div>
                             </div>
                         </div>
@@ -384,7 +389,7 @@
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal"
 							aria-hidden="true">&times;</button>
-				<h4>Árbol de Detalles del Documento </h4>
+				<h4>Flujograma del Documento </h4>
 				</div>
 				<div class="modal-body">
 					<div class="tab-content">
@@ -479,105 +484,80 @@
 	<script>
 
         $('document').ready(function () {
-			destinatario_simple();
+			destinatario_simple()
 			mostrar_imgs_documento()
 			mostrar_pdfs_documento()
 			mostrar_imgs_arbol()
 			mostrar_pdfs_arbol()
 			remitente_arbol()
 			destinatario_arbol()
-			//array_pdf()
-			//array_imagenes()
-            //division();
+			
         });
 		async function mostrar_imgs_documento(){
 			var id='{{$midata->id}}'
-			var images= await array_imagenes(id)
-			if (images) {
+			var id_doc={
+				id:id
+			}
+			var images= await axios.post("{{setting('admin.url')}}api/obtener/img/documento", id_doc)
+			if (images.data) {
 				var lista=""
-				for (let index = 0; index < images.length; index++) {
-					//lista+="<tr><td>"+images[index]+"</td><tr>"
-					// lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+images[index]+"' class='link-primary'>"+images[index]+"</a></td></tr>"
-					lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+images[index]+"' class='link-primary'><img class='img-responsive' src='{{ setting('admin.url').'storage/' }}"+images[index]+"' ></a></td></tr>"
-
-					//lista+="<tr><td><img class='img-responsive' src='{{ setting('admin.url').'storage/' }}"+images[index]+"' alt=''></td></tr>"
-					// $('#images_body').html("<tr><td>"+images[index]+"</td><tr>")
+				for (let index = 0; index < images.data.length; index++) {
+					lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+images.data[index]+"' class='link-primary'><img class='img-responsive' src='{{ setting('admin.url').'storage/' }}"+images.data[index]+"' ></a></td></tr>"
 				}
 				$('#images_body').html(lista)
 			}
-			
 		}
 		async function mostrar_pdfs_documento(){
 			var id='{{$midata->id}}'
-			var pdfs= await array_pdfs(id)
-			if (pdfs) {
+			var id_doc={
+				id:id
+			}
+			var pdfs= await axios.post("{{setting('admin.url')}}api/obtener/pdf/documento", id_doc)
+			if (pdfs.data) {
 				var lista=""
-				for (let index = 0; index < pdfs.length; index++) {
-					//lista+="<tr><td>"+pdfs[index]+"</td><tr>"
-					// lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+pdfs[index]+"' class='link-primary'>"+pdfs[index]+"</a></td></tr>"
-					lista+="<tr><td><iframe class='embed-responsive-item' src='https://docs.google.com/viewer?url=https://panel.cmt.gob.bo/storage/documentos//July2022//7g9y6fQo8nENKGxEBUeJ.pdf&embedded=true'  height='200' style='border: none;'></iframe></td></tr>"
+				for (let index = 0; index < pdfs.data.length; index++) {
+					lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+pdfs.data[index].download_link+"' class='link-primary'>"+pdfs.data[index].original_name+"</a></td></tr>"
 				}
 				$('#pdf_body').html(lista)
 			}
-			
 		}
-
 		async function mostrar_imgs_arbol(){
 			var id='{{$midata->id}}'
 			var detalle= await axios("{{setting('admin.url')}}api/find/documento/detalle/"+id)
 			for (let contador = 0; contador < detalle.data.length; contador++) {
-				if (detalle.data[contador].image) {
-					var images= []
-					var separador=","
-					var arrayDeCadenas = detalle.data[1].image.split(separador);
-					// console.log(pdf)
-					// console.log(images)
-					//console.log(arrayDeCadenas[0])
-					var separador='"'
-					for (let index = 0; index < arrayDeCadenas.length; index++) {
-						var array2= arrayDeCadenas[index].split(separador)
-						images.push(array2[1])
-					}
-					//console.log(images)
+				var id_doc={
+					id:detalle.data[contador].id
+				}
+				var images= await axios.post("{{setting('admin.url')}}api/obtener/img/arbol", id_doc)
+				if (detalle.data[contador].image.length>2) {
 					var lista=""
-					for (let index = 0; index < images.length; index++) {
-						lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+images[index]+"' class='link-primary'>Imagen "+(index+1)+"</a></td></tr>"
+					for (let index = 0; index < images.data.length; index++) {
+						lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+images.data[index]+"' class='link-primary'>Imagen "+(index+1)+"</a></td></tr>"
 					}
 					$('#images_arbol_'+detalle.data[contador].id+'').html(lista)
 				}
-			}
-			
+			}	
 		}
 		async function mostrar_pdfs_arbol(){
 			var id='{{$midata->id}}'
 			var detalle= await axios("{{setting('admin.url')}}api/find/documento/detalle/"+id)
 			for (let contador = 0; contador < detalle.data.length; contador++) {
-				if (detalle.data[contador].pdf) {
-					var pdf= []
-					var separador=","
-					var arrayDeCadenas = detalle.data[contador].pdf.split(separador);
-					// console.log(pdf)
-					// console.log(images)
-					//console.log(arrayDeCadenas[0])
-					var separador='"'
-					for (let index = 0; index < arrayDeCadenas.length; index++) {
-						var array2= arrayDeCadenas[index].split(separador)
-						pdf.push(array2[1])
-					}
-					//console.log(pdf)
+				var id_doc={
+					id:detalle.data[contador].id
+				}
+				var pdf= await axios.post("{{setting('admin.url')}}api/obtener/pdf/arbol", id_doc)
+				if (detalle.data[contador].pdf.length>2) {
 					var lista=""
-					for (let index = 0; index < pdf.length; index++) {
-						lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+pdf[index]+"' class='link-primary'>PDF "+(index+1)+"</a></td></tr>"
+					for (let index = 0; index < pdf.data.length; index++) {
+						lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+pdf.data[index].download_link+"' class='link-primary'>"+pdf.data[index].original_name+"</a></td></tr>"
 					}
 					$('#pdfs_arbol_'+detalle.data[contador].id+'').html(lista)
 				}
 			}
-			
 		}
 		async function remitente_arbol(){
 			var id='{{$midata->id}}'
 			var documento= await axios("{{setting('admin.url')}}api/find/documento/"+id)
-			console.log(documento.data)
 			var detalle= await axios("{{setting('admin.url')}}api/find/documento/detalle/"+id)
 			for (let index = 0; index < detalle.data.length; index++) {
 				if (index==0) {
@@ -593,9 +573,7 @@
 					//Cuerpo del Arbol
 					var user= await axios("{{setting('admin.url')}}api/find/user/"+detalle.data[index].user_id)
 					$('#remitente_arbol_'+detalle.data[index].id+'').html(user.data.name)
-
-				}
-				
+				}	
 			}
 		}
 		async function destinatario_arbol(){
@@ -616,89 +594,40 @@
 				}
 			}
 		}
-
-		async function array_imagenes(id){
-			var documento= await axios("{{setting('admin.url')}}api/find/documento/"+id)
-			if (documento.data.archivo) {
-				var images= []
-				var separador=","
-				var arrayDeCadenas = documento.data.archivo.split(separador);
-				// console.log(pdf)
-				// console.log(images)
-				//console.log(arrayDeCadenas[0])
-				var separador='"'
-				for (let index = 0; index < arrayDeCadenas.length; index++) {
-					var array2= arrayDeCadenas[index].split(separador)
-					images.push(array2[1])
-				}
-				//console.log(images)
-				
-				// console.log(documento.data.archivo)
-				return images;
-			}
-			else{
-				return false;
-			}
-			
-		}
-		async function array_pdfs(id){
-			var documento= await axios("{{setting('admin.url')}}api/find/documento/"+id)
-			if (documento.data.pdf>2) {
-				var pdf= []
-				var separador=","
-				var arrayDeCadenas = documento.data.pdf.split(separador);
-				var separador=':'
-				for (let index = 0; index < arrayDeCadenas.length; index++) {
-					if (index%2==0) {
-						var array2= arrayDeCadenas[index].split(separador)
-						var separador='"'
-						var array3= array2[1].split(separador)
-						pdf.push(array3[1])
-					}
-				}
-				return pdf;
-			}
-			else{
-				return false;
-			}
-			
-		}
-
 		//Cargar Destinatarios
 		async function destinatario_simple(){
 			var user = await axios.get("{{ setting('admin.url') }}api/users");
-			$('#usuario_derivar').find('option').remove().end();
-			$('#usuario_derivar').append($('<option>', {
+			$('#destinatario_id_derivacion').find('option').remove().end();
+			$('#destinatario_id_derivacion').append($('<option>', {
 				value: 0,
 				text: 'Elige un Destinatario'
 			}));
 			for (let index = 0; index < user.data.length; index++) {
-				$('#usuario_derivar').append($('<option>', {
+				$('#destinatario_id_derivacion').append($('<option>', {
 					value: user.data[index].id,
 					text: user.data[index].name
 				}));
 			}
 		}
-
 		async function derivar(id) {
 			var midata = JSON.stringify({ documento_id: id, estado_id: 2 })
 			var derivar = await axios("{{setting('admin.url')}}api/derivar/"+midata)
 			var documento= await axios("{{setting('admin.url')}}api/find/documento/"+id)
-
 			//Guardar Primer Detalle Documento
 			var mensaje= documento.data.message
 			var user_id = '{{ Auth::user()->id }}'
-			var destinatario_id=$('#usuario_derivar').val()
-
+			var destinatario_id=$('#destinatario_id_derivacion').val()
+			var destinatario_derivacion='{{$midata->destinatario_id}}'
 			var data_detalle={
 				documento_id: id,
 				user_id: user_id,
 				mensaje: mensaje,
-				destinatario: destinatario_id
+				destinatario_interno: destinatario_derivacion,
+				archivo:documento.data.archivo,
+				pdf:documento.data.pdf
 			}
 			await axios.post("{{setting('admin.url')}}api/registrar/first/detalle", data_detalle)
 			//---------------------------------
-			// console.log(derivar.data)
 			//Mensaje por Wpp al Primer al destinatario principal 
 			var mensaje=''
 			if (documento.data.remitente_interno) {
@@ -716,12 +645,10 @@
 			mensaje+='Ingresa al Sistema para revisarlo: \n'
 			mensaje+=''+link+''
 			mensaje+='Recuerda que si te olvidaste tus credenciales puedes enviar la palabra: *Login* para restablecerlas.\n'
-			// console.log(mensaje)
 			var data={
 				message: mensaje,
 				phone: documento.data.destinatario.phone
 			}
-			// console.log(data)
 			var wpp= await axios.post("{{setting('admin.chatbot_url')}}chat", data)
 			//Mensaje por Wpp a los destinatarios COPIAS
 			for (let index = 0; index < documento.data.copias.length; index++) {
@@ -736,135 +663,18 @@
 				mensaje+='Ingresa al Sistema para revisarlo: \n'
 				mensaje+=''+link+''
 				mensaje+='Recuerda que si te olvidaste tus credenciales puedes enviar la palabra: *Login* para restablecerlas.\n'
-				// console.log(mensaje)
 				var data={
 					message: mensaje,
 					phone: destinatario_copia.data.phone
 				}
-				// console.log(data)
 				var wpp= await axios.post("{{setting('admin.chatbot_url')}}chat", data)
-
 			}
 			location.reload()
-
 		}
-
-		async function responder(id){
-			var mensaje= $("textarea[name='mensaje_respuesta']").val();
-			// var images=1
-			// var pdf=1
-			var user_id = '{{ Auth::user()->id }}'
-
-			var data={
-				documento_id: id,
-				user_id: user_id,
-				mensaje: mensaje
-			}
-
-			var respuesta=await axios.post("{{setting('admin.url')}}api/responder", data)
-			if (respuesta.data) {
-				location.href='/admin/documentos'
-				toastr.succes("Se respondió exitosamente")
-			}
+		async function deshabilitar_botones(){
+			$('#button_respuesta').css('display','none')
+			$('#button_derivacion').css('display','none')
+			$('#button_rechazo').css('display','none')
 		}
-
-		async function derivar_simple(id){
-			var mensaje= $("textarea[name='mensaje_respuesta']").val();
-			var user_id = '{{ Auth::user()->id }}'
-			var destinatario_id=$('#usuario_derivar').val()
-
-			var data={
-				documento_id: id,
-				user_id: user_id,
-				mensaje: mensaje,
-				destinatario: destinatario_id
-			}
-			var data_deriv={
-				documento_id: id,
-				user_id: user_id
-			}
-			await axios.post("{{setting('admin.url')}}api/save/rel/deriv", data_deriv)
-
-			var respuesta= await axios.post("{{setting('admin.url')}}api/derivar2", data)
-
-			//Mensaje por Wpp al nuevo derivado
-			var documento= await axios("{{setting('admin.url')}}api/find/documento/"+id)
-			var mensaje=''
-			if (documento.data.remitente_interno) {
-				var remitente= documento.data.remitente_interno.name
-			}
-			else if(documento.data.remitente_externo){
-				var remitente= documento.data.remitente_externo.display
-			}
-			var link="{{setting('admin.url')}}admin/documentos \n"
-			mensaje+='Hola *'+documento.data.destinatario.name+'*, tiene nueva correspondencia.\n'
-			mensaje+='*ID*: '+id+' \n'
-			mensaje+='*Mensaje*: '+documento.data.message+'\n'
-			mensaje+='*Categoria*: '+documento.data.categoria.name+'\n'
-			mensaje+='*Enviado por*: '+remitente+'\n'
-			mensaje+='Ingresa al Sistema para revisarlo: \n'
-			mensaje+=''+link+''
-			mensaje+='Recuerda que si te olvidaste tus credenciales puedes enviar la palabra: *Login* para restablecerlas.\n'
-			// console.log(mensaje)
-			var data_mensaje={
-				message: mensaje,
-				phone: documento.data.destinatario.phone
-			}
-			// console.log(data)
-			var wpp= await axios.post("{{setting('admin.chatbot_url')}}chat", data_mensaje)
-			//-------------------------------------------
-
-			if (respuesta.data) {
-				location.href='/admin/documentos'
-				toastr.succes("Se derivó exitosamente")
-			}
-		}
-
-		async function rechazar(id){
-			var mensaje= $("textarea[name='mensaje_respuesta']").val();
-			var user_id = '{{ Auth::user()->id }}'
-
-			var data={
-				documento_id: id,
-				user_id: user_id,
-				mensaje: mensaje
-			}
-
-			var respuesta=await axios.post("{{setting('admin.url')}}api/rechazar", data)
-			if (respuesta.data) {
-				location.href='/admin/documentos'
-				toastr.succes("Se rechazó exitosamente")
-			}
-		}
-
-		// async function derivar_a_terceros(id){
-		// 	$('#derivaciones_otros tbody').empty();
-
-		// 	$("#derivaciones_otros").append("<tr><td>"+id+"</td><td>"+'Mensaje'+"</td><td>"+'Seleccionar Destinatario'+"</td><td>"+'Fecha'+"</td><td>"+'Agregar mas Destinatario'+"</td></tr>");
-		// }
-
-        // function dividirCadena(cadenaADividir,separador){
-        //     var arrayDeCadenas = cadenaADividir.split(separador);
-        //     return arrayDeCadenas;
-        // }
-
-        function division(){
-            // console.log($('#user_remitente').val());
-            // console.log($('#user_remitente').text());
-
-            // var cadenaADividir=["documentos\/April2022\/8bVgIeV3UmrayLBVm56G.png","documentos\/April2022\/Ic4bBSfgXwydxShb9Klx.png","documentos\/April2022\/VmIYJYkK2TdPXbMtV3dN.png"];
-            // var separador='"';
-            // var arrayDeCadenas = cadenaADividir.split(separador);
-            // console.log(arrayDeCadenas);
-
-            // const authHeader = ["documentos\/April2022\/8bVgIeV3UmrayLBVm56G.png","documentos\/April2022\/Ic4bBSfgXwydxShb9Klx.png","documentos\/April2022\/VmIYJYkK2TdPXbMtV3dN.png"]
-            // const split = authHeader.split(',') // (1) [ 'bearer', 'token' ]
-            // const token = split[1] // (2) token
-
-            const token= ["documentos\/April2022\/8bVgIeV3UmrayLBVm56G.png","documentos\/April2022\/Ic4bBSfgXwydxShb9Klx.png","documentos\/April2022\/VmIYJYkK2TdPXbMtV3dN.png"]
-            //const token =vector;
-            console.log(token[1]);
-        }
-
 	</script>
 @stop
