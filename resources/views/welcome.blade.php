@@ -12,7 +12,7 @@
           </div>
         </div>
         <div class="col-lg-6 order-1 order-lg-2 hero-img" data-aos="fade-left">
-          <img src="https://panel.cmt.gob.bo//storage/landingpage/BannerPrincipal.jpeg" class="img-fluid" alt="">
+          <img src="https://cmt.gob.bo//storage/landingpage/BannerPrincipal.jpeg" class="img-fluid" alt="">
         </div>
       </div>
     </div>
@@ -24,7 +24,7 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-6" data-aos="zoom-in">
-            <img src="https://panel.cmt.gob.bo//storage/landingpage/backgroup.jpg" class="img-fluid" alt="">
+            <img src="https://cmt.gob.bo//storage/landingpage/backgroup.jpg" class="img-fluid" alt="">
             <p class="fst-italic" style="text-align: justify">
               Motivado por el deseo de expresar gratitud  a los estimados seguidores de este portal Web, como Presidente del Concejo Municipal de Trinidad gestión 2021-2022,  quiero hacerles llegar mis más sinceros agradecimientos.
             </p>

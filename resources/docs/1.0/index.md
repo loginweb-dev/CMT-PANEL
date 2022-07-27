@@ -1,2 +1,7 @@
 - ## Get Started
     - [Overview](/{{route}}/{{version}}/overview)
+    - [Pagina Web](/{{route}}/{{version}}/pagina)
+    - [Gaceta](/{{route}}/{{version}}/pagina)
+    - [Convocatorias](/{{route}}/{{version}}/pagina)
+    - [Gestion Documental](/{{route}}/{{version}}/pagina)
+    - [Chatbot](/{{route}}/{{version}}/pagina)

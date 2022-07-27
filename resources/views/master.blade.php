@@ -250,7 +250,7 @@
       font-size: 12px;
       border-radius: 12px;
     }
-</style>
+  </style>
 </head>
 
 <body>
@@ -316,7 +316,7 @@
   <footer id="footer">
     <div class="container">
       <div class="credits">
-        Powrer by <a href="#">LoginWeb @2022</a>
+        Powered by <a href="#">LoginWeb @2022</a>
       </div>
     </div>
   </footer>
@@ -339,218 +339,218 @@
   @yield('javascript')
 
   <script>
-        $(function() {
-        var INDEX = 0;
-        $("#chat-submit").click( async function(e) {
-            e.preventDefault();
-            var msg = $("#chat-input").val();
-            if (msg == '') {
-              toastr.error('😕 Ingresa una opcion o un texto valido')
-              $(".chat-logs").stop().animate({ scrollTop: $(".chat-logs")[0].scrollHeight}, 1000);
-              return true;
-            }
-            var str="";
-            str += "<div id='cm-msg-"+INDEX+"' class=\"chat-msg self\">";
-            str += "          <span class=\"msg-avatar\">";
-            str += "            <img src=\"https://cmt.gob.bo//storage/landingpage/chat.png\">";
-            str += "          <\/span>";
-            str += "          <div class=\"cm-msg-text\">";
-            str += msg;
-            str += "          <\/div>";
-            str += "        <\/div>";
-            $(".chat-logs").append(str);
-            var misession = localStorage.getItem('michat') ? JSON.parse(localStorage.getItem('michat')) : []
-            var miregister = localStorage.getItem('miregister') ? parseInt(localStorage.getItem('miregister')) : 0
-            switch (miregister) {
-              case 0: // Inicio
-                var str="";
-                str += "<div id='cm-msg-"+INDEX+"' class=\"chat-msg user\">";
-                str += "          <span class=\"msg-avatar\">";
-                str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
-                str += "          <\/span>";
-                str += "          <div class=\"cm-msg-text\">";
-                str += "Hola, soy un 🤖CHATBOT🤖 tu asistente virtual, antes de empezar nececitamos tus datos, cual es tu nombre completo ?"
-                str += "          <\/div>";
-                str += "        <\/div>";
-                $(".chat-logs").append(str);
-                localStorage.setItem('miregister', 1);
-                break;
-              case 1: //Nombre
-              console.log('miregister')
-                localStorage.setItem('michat', JSON.stringify({name: msg, phone: null}))
-                misession = JSON.parse(localStorage.getItem('michat'))
-                var str="";
-                str += "<div id='cm-msg-"+INDEX+"' class=\"chat-msg user\">";
-                str += "          <span class=\"msg-avatar\">";
-                str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
-                str += "          <\/span>";
-                str += "          <div class=\"cm-msg-text\">";
-                str += "Bienvenido, "+misession.name+" ahora necesitamos tu numero de whatsapp, cual es?"
-                str += "          <\/div>";
-                str += "        <\/div>";
-                $(".chat-logs").append(str);
-                localStorage.setItem('miregister', 2);
-                break;
-              case 2: // Telefono
-
-                localStorage.setItem('michat', JSON.stringify({name: misession.name, phone: msg}))
-                misession = JSON.parse(localStorage.getItem('michat'))
-                var str="";
-                str += "<div id='cm-msg-"+INDEX+"' class=\"chat-msg user\">";
-                str += "          <span class=\"msg-avatar\">";
-                str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
-                str += "          <\/span>";
-                str += "          <div class=\"cm-msg-text\">";
-                str += "Gracias por tus datos, en que te puedo ayudar ? <strong>(envia un hola)</strong>"
-                str += "          <\/div>";
-                str += "        <\/div>";
-                $(".chat-logs").append(str);
-                localStorage.setItem('miregister', 3);
-                break;
-              default:       
-                  if (msg.match(/hola/) || msg.match(/Hola/) || msg.match(/Buenas/)){
-                    var result = await axios('https://cmt.gob.bo/api/preguntas'); 
-                    var str="";
-                    str += "<div class=\"chat-msg user\">";
-                    str += "          <span class=\"msg-avatar\">";
-                    str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
-                    str += "          <\/span>";
-                    str += "          <div class=\"cm-msg-text\">";
-                    str += "Hola, "+misession.name+" soy un 🤖CHATBOT🤖 tu asistente virtual, Envia una de las opciones <br><ul>"
-                      for (let index = 0; index < result.data.length; index++) {
-                        str+= "<li><strong>A"+result.data[index].id + " .- </strong>" +result.data[index].title+"</li>"                        
-                      }
-                    str += "          </ul>Envia una de las opciones ejemplo: a1<\/div>";
-                    str += "        <\/div>";
-                    $(".chat-logs").append(str);
-                  }else if (msg.match(/login/) || msg.match(/Login/)) {
-                    var str="";
-                    str += "<div class=\"chat-msg user\">";
-                    str += "          <span class=\"msg-avatar\">";
-                    str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
-                    str += "          <\/span>";
-                    str += "          <div class=\"cm-msg-text\">";
-                    str += "Se te envio la respusta a tu whatsapp por seguridad, revisalo por favor.<br>"
-                    str += "luego ingresa al link : <a href='/admin'>Mi Panel</a>"
-                    str += "          <\/div>";
-                    str += "        <\/div>";
-                    $(".chat-logs").append(str);
-                  }else if (msg == 'A1'|| msg == 'a1') {
-                    var result = await axios('https://cmt.gob.bo/api/concejales'); 
-                    var str="";
-                    str += "<div class=\"chat-msg user\">";
-                    str += "          <span class=\"msg-avatar\">";
-                    str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
-                    str += "          <\/span>";
-                    str += "          <div class=\"cm-msg-text\">";
-                    str += misession.name+", Te muestro una lista actualizada <br><ul>"
-                      for (let index = 0; index < result.data.length; index++) {
-                        str+= "<li><a href='/miconcejal/"+result.data[index].id+"' target='_blank'>" +result.data[index].titular+"</a></li>"                        
-                      }
-                    str += "          </ul>dale click para mas info.<\/div>";
-                    str += "        <\/div>";
-                    $(".chat-logs").append(str);
-                  }else if (msg == 'A2'|| msg == 'a2') { //5 gacetas
-                    var result = await axios('https://cmt.gob.bo/api/5gacetas'); 
-                    var str="";
-                    str += "<div class=\"chat-msg user\">";
-                    str += "          <span class=\"msg-avatar\">";
-                    str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
-                    str += "          <\/span>";
-                    str += "          <div class=\"cm-msg-text\">";
-                    str += misession.name+", Te muestro una lista actualizada <br><ul>"
-                      for (let index = 0; index < result.data.length; index++) {
-                        str+= "<li><a href='https://cmt.gob.bo//storage/"+result.data[index].file+"' target='_blank'>" +result.data[index].name+"</a></li>"                        
-                      }
-                    str += "          </ul>dale click para mas info.<\/div>";
-                    str += "        <\/div>";
-                    $(".chat-logs").append(str);
-                  }else if (msg == 'A3'|| msg == 'a3') { //5 convocatorias
-                    var result = await axios('https://cmt.gob.bo/api/5convocatorias'); 
-                    var str="";
-                    str += "<div class=\"chat-msg user\">";
-                    str += "          <span class=\"msg-avatar\">";
-                    str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
-                    str += "          <\/span>";
-                    str += "          <div class=\"cm-msg-text\">";
-                    str += misession.name+", Te muestro una lista actualizada <br><ul>"
-                      for (let index = 0; index < result.data.length; index++) {
-                        str+= "<li><a href='https://cmt.gob.bo//storage/"+result.data[index].file+"' target='_blank'>" +result.data[index].name+"</a></li>"                        
-                      }
-                    str += "          </ul>dale click para mas info.<\/div>";
-                    str += "        <\/div>";
-                    $(".chat-logs").append(str);
-                  }else if (msg == 'A4'|| msg == 'a4') { // Login
-                    var str="";
-                    str += "<div class=\"chat-msg user\">";
-                    str += "          <span class=\"msg-avatar\">";
-                    str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
-                    str += "          <\/span>";
-                    str += "          <div class=\"cm-msg-text\">";
-                    str += misession.name+", te mandamos tus credenciales a tu whatsapp, revisalo porfavor.<br>"
-                    str += "         <\/div>";
-                    str += "        <\/div>";
-                    $(".chat-logs").append(str);
-                  }else if (msg == 'A5'|| msg == 'a5') { // Login
-                    var str="";
-                    str += "<div class=\"chat-msg user\">";
-                    str += "          <span class=\"msg-avatar\">";
-                    str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
-                    str += "          <\/span>";
-                    str += "          <div class=\"cm-msg-text\">";
-                    str += "Vuelve pronto, "+misession.name
-                    str += "         <\/div>";
-                    str += "        <\/div>";
-                    $(".chat-logs").append(str);
-                    localStorage.removeItem('michat')
-                    localStorage.removeItem('miregister') 
-                    location.reload()
-                  }else{
-                    var str="";
-                    str += "<div class=\"chat-msg user\">";
-                    str += "          <span class=\"msg-avatar\">";
-                    str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
-                    str += "          <\/span>";
-                    str += "          <div class=\"cm-msg-text\">";
-                    str += misession.name+", 😕 Ingresa una opcion valida. ejemplo: Hola <br>"
-                    str += "          <\/div>";
-                    str += "        <\/div>";
-                    $(".chat-logs").append(str);
-                    toastr.error('😕 Ingresa una opcion valida. ejemplo: Hola')
-                  }
-                  break;
-            }
-            $("#chat-input").val('');
+    $(function() {
+      var INDEX = 0;
+      $("#chat-submit").click( async function(e) {
+          e.preventDefault();
+          var msg = $("#chat-input").val();
+          if (msg == '') {
+            toastr.error('😕 Ingresa una opcion o un texto valido')
             $(".chat-logs").stop().animate({ scrollTop: $(".chat-logs")[0].scrollHeight}, 1000);
-        })
-
-        $("#chat-circle").click(async function() {
-          toastr.success('😃 Iniciando Chats')
-          var misession = localStorage.getItem('michat') ? JSON.parse(localStorage.getItem('michat')) : []
-          var result = await axios('https://cmt.gob.bo/api/preguntas'); 
+            return true;
+          }
           var str="";
-          str += "<div class=\"chat-msg user\">";
+          str += "<div id='cm-msg-"+INDEX+"' class=\"chat-msg self\">";
           str += "          <span class=\"msg-avatar\">";
-          str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
+          str += "            <img src=\"https://cmt.gob.bo//storage/landingpage/chat.png\">";
           str += "          <\/span>";
           str += "          <div class=\"cm-msg-text\">";
-          str += "Hola, "+misession.name+" soy un 🤖CHATBOT🤖 tu asistente virtual, Envia una de las opciones <br><ul>"
-            for (let index = 0; index < result.data.length; index++) {
-              str+= "<li><strong>A"+result.data[index].id + " .- </strong>" +result.data[index].title+"</li>"                        
-            }
-          str += "          </ul>Envia una de las opciones ejemplo: a1<\/div>";
+          str += msg;
+          str += "          <\/div>";
           str += "        <\/div>";
           $(".chat-logs").append(str);
-          $("#chat-circle").toggle('scale');
-          $(".chat-box").toggle('scale');
-          $(".chat-logs").stop().animate({ scrollTop: $(".chat-logs")[0].scrollHeight}, 1000);
-        })
+          var misession = localStorage.getItem('michat') ? JSON.parse(localStorage.getItem('michat')) : []
+          var miregister = localStorage.getItem('miregister') ? parseInt(localStorage.getItem('miregister')) : 0
+          switch (miregister) {
+            case 0: // Inicio
+              var str="";
+              str += "<div id='cm-msg-"+INDEX+"' class=\"chat-msg user\">";
+              str += "          <span class=\"msg-avatar\">";
+              str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
+              str += "          <\/span>";
+              str += "          <div class=\"cm-msg-text\">";
+              str += "Hola, soy un 🤖CHATBOT🤖 tu asistente virtual, antes de empezar nececitamos tus datos, cual es tu nombre completo ?"
+              str += "          <\/div>";
+              str += "        <\/div>";
+              $(".chat-logs").append(str);
+              localStorage.setItem('miregister', 1);
+              break;
+            case 1: //Nombre
+            console.log('miregister')
+              localStorage.setItem('michat', JSON.stringify({name: msg, phone: null}))
+              misession = JSON.parse(localStorage.getItem('michat'))
+              var str="";
+              str += "<div id='cm-msg-"+INDEX+"' class=\"chat-msg user\">";
+              str += "          <span class=\"msg-avatar\">";
+              str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
+              str += "          <\/span>";
+              str += "          <div class=\"cm-msg-text\">";
+              str += "Bienvenido, "+misession.name+" ahora necesitamos tu numero de whatsapp, cual es?"
+              str += "          <\/div>";
+              str += "        <\/div>";
+              $(".chat-logs").append(str);
+              localStorage.setItem('miregister', 2);
+              break;
+            case 2: // Telefono
 
-        $(".chat-box-toggle").click(function() {
-          toastr.error('😔 Cerrando Chats')
-          $("#chat-circle").toggle('scale')
-          $(".chat-box").toggle('scale')
-        })
+              localStorage.setItem('michat', JSON.stringify({name: misession.name, phone: msg}))
+              misession = JSON.parse(localStorage.getItem('michat'))
+              var str="";
+              str += "<div id='cm-msg-"+INDEX+"' class=\"chat-msg user\">";
+              str += "          <span class=\"msg-avatar\">";
+              str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
+              str += "          <\/span>";
+              str += "          <div class=\"cm-msg-text\">";
+              str += "Gracias por tus datos, en que te puedo ayudar ? <strong>(envia un hola)</strong>"
+              str += "          <\/div>";
+              str += "        <\/div>";
+              $(".chat-logs").append(str);
+              localStorage.setItem('miregister', 3);
+              break;
+            default:       
+                if (msg.match(/hola/) || msg.match(/Hola/) || msg.match(/Buenas/)){
+                  var result = await axios('https://cmt.gob.bo/api/preguntas'); 
+                  var str="";
+                  str += "<div class=\"chat-msg user\">";
+                  str += "          <span class=\"msg-avatar\">";
+                  str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
+                  str += "          <\/span>";
+                  str += "          <div class=\"cm-msg-text\">";
+                  str += "Hola, "+misession.name+" soy un 🤖CHATBOT🤖 tu asistente virtual, Envia una de las opciones <br><ul>"
+                    for (let index = 0; index < result.data.length; index++) {
+                      str+= "<li><strong>A"+result.data[index].id + " .- </strong>" +result.data[index].title+"</li>"                        
+                    }
+                  str += "          </ul>Envia una de las opciones ejemplo: a1<\/div>";
+                  str += "        <\/div>";
+                  $(".chat-logs").append(str);
+                }else if (msg.match(/login/) || msg.match(/Login/)) {
+                  var str="";
+                  str += "<div class=\"chat-msg user\">";
+                  str += "          <span class=\"msg-avatar\">";
+                  str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
+                  str += "          <\/span>";
+                  str += "          <div class=\"cm-msg-text\">";
+                  str += "Se te envio la respusta a tu whatsapp por seguridad, revisalo por favor.<br>"
+                  str += "luego ingresa al link : <a href='/admin'>Mi Panel</a>"
+                  str += "          <\/div>";
+                  str += "        <\/div>";
+                  $(".chat-logs").append(str);
+                }else if (msg == 'A1'|| msg == 'a1') {
+                  var result = await axios('https://cmt.gob.bo/api/concejales'); 
+                  var str="";
+                  str += "<div class=\"chat-msg user\">";
+                  str += "          <span class=\"msg-avatar\">";
+                  str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
+                  str += "          <\/span>";
+                  str += "          <div class=\"cm-msg-text\">";
+                  str += misession.name+", Te muestro una lista actualizada <br><ul>"
+                    for (let index = 0; index < result.data.length; index++) {
+                      str+= "<li><a href='/miconcejal/"+result.data[index].id+"' target='_blank'>" +result.data[index].titular+"</a></li>"                        
+                    }
+                  str += "          </ul>dale click para mas info.<\/div>";
+                  str += "        <\/div>";
+                  $(".chat-logs").append(str);
+                }else if (msg == 'A2'|| msg == 'a2') { //5 gacetas
+                  var result = await axios('https://cmt.gob.bo/api/5gacetas'); 
+                  var str="";
+                  str += "<div class=\"chat-msg user\">";
+                  str += "          <span class=\"msg-avatar\">";
+                  str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
+                  str += "          <\/span>";
+                  str += "          <div class=\"cm-msg-text\">";
+                  str += misession.name+", Te muestro una lista actualizada <br><ul>"
+                    for (let index = 0; index < result.data.length; index++) {
+                      str+= "<li><a href='https://cmt.gob.bo//storage/"+result.data[index].file+"' target='_blank'>" +result.data[index].name+"</a></li>"                        
+                    }
+                  str += "          </ul>dale click para mas info.<\/div>";
+                  str += "        <\/div>";
+                  $(".chat-logs").append(str);
+                }else if (msg == 'A3'|| msg == 'a3') { //5 convocatorias
+                  var result = await axios('https://cmt.gob.bo/api/5convocatorias'); 
+                  var str="";
+                  str += "<div class=\"chat-msg user\">";
+                  str += "          <span class=\"msg-avatar\">";
+                  str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
+                  str += "          <\/span>";
+                  str += "          <div class=\"cm-msg-text\">";
+                  str += misession.name+", Te muestro una lista actualizada <br><ul>"
+                    for (let index = 0; index < result.data.length; index++) {
+                      str+= "<li><a href='https://cmt.gob.bo//storage/"+result.data[index].file+"' target='_blank'>" +result.data[index].name+"</a></li>"                        
+                    }
+                  str += "          </ul>dale click para mas info.<\/div>";
+                  str += "        <\/div>";
+                  $(".chat-logs").append(str);
+                }else if (msg == 'A4'|| msg == 'a4') { // Login
+                  var str="";
+                  str += "<div class=\"chat-msg user\">";
+                  str += "          <span class=\"msg-avatar\">";
+                  str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
+                  str += "          <\/span>";
+                  str += "          <div class=\"cm-msg-text\">";
+                  str += misession.name+", te mandamos tus credenciales a tu whatsapp, revisalo porfavor.<br>"
+                  str += "         <\/div>";
+                  str += "        <\/div>";
+                  $(".chat-logs").append(str);
+                }else if (msg == 'A5'|| msg == 'a5') { // Login
+                  var str="";
+                  str += "<div class=\"chat-msg user\">";
+                  str += "          <span class=\"msg-avatar\">";
+                  str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
+                  str += "          <\/span>";
+                  str += "          <div class=\"cm-msg-text\">";
+                  str += "Vuelve pronto, "+misession.name
+                  str += "         <\/div>";
+                  str += "        <\/div>";
+                  $(".chat-logs").append(str);
+                  localStorage.removeItem('michat')
+                  localStorage.removeItem('miregister') 
+                  location.reload()
+                }else{
+                  var str="";
+                  str += "<div class=\"chat-msg user\">";
+                  str += "          <span class=\"msg-avatar\">";
+                  str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
+                  str += "          <\/span>";
+                  str += "          <div class=\"cm-msg-text\">";
+                  str += misession.name+", 😕 Ingresa una opcion valida. ejemplo: Hola <br>"
+                  str += "          <\/div>";
+                  str += "        <\/div>";
+                  $(".chat-logs").append(str);
+                  toastr.error('😕 Ingresa una opcion valida. ejemplo: Hola')
+                }
+                break;
+          }
+          $("#chat-input").val('');
+          $(".chat-logs").stop().animate({ scrollTop: $(".chat-logs")[0].scrollHeight}, 1000);
+      })
+
+      $("#chat-circle").click(async function() {
+        toastr.success('😃 Iniciando Chats')
+        var misession = localStorage.getItem('michat') ? JSON.parse(localStorage.getItem('michat')) : []
+        var result = await axios('https://cmt.gob.bo/api/preguntas'); 
+        var str="";
+        str += "<div class=\"chat-msg user\">";
+        str += "          <span class=\"msg-avatar\">";
+        str += "            <img src=\"https://cmt.gob.bo//storage/users/default.png\">";
+        str += "          <\/span>";
+        str += "          <div class=\"cm-msg-text\">";
+        str += "Hola, "+misession.name+" soy un 🤖CHATBOT🤖 tu asistente virtual, Envia una de las opciones <br><ul>"
+          for (let index = 0; index < result.data.length; index++) {
+            str+= "<li><strong>A"+result.data[index].id + " .- </strong>" +result.data[index].title+"</li>"                        
+          }
+        str += "          </ul>Envia una de las opciones ejemplo: a1<\/div>";
+        str += "        <\/div>";
+        $(".chat-logs").append(str);
+        $("#chat-circle").toggle('scale');
+        $(".chat-box").toggle('scale');
+        $(".chat-logs").stop().animate({ scrollTop: $(".chat-logs")[0].scrollHeight}, 1000);
+      })
+
+      $(".chat-box-toggle").click(function() {
+        toastr.error('😔 Cerrando Chats')
+        $("#chat-circle").toggle('scale')
+        $(".chat-box").toggle('scale')
+      })
     })
   </script>
 </body>
