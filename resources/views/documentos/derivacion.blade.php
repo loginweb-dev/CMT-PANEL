@@ -20,13 +20,21 @@
         $('document').ready(function () {
             derivar_simple('{{$doc_detalle->documento_id}}')
         });
+		function htmlToText(html) {
+			var temp = document.createElement('div');
+			temp.innerHTML = html;
+			return temp.textContent; // Or return temp.innerText if you need to return only visible text. It's slower.
+		}
 
         async function derivar_simple(id){
 			//Mensaje por Wpp al nuevo derivado
 			var documento= await axios("{{setting('admin.url')}}api/find/documento/"+id)
             var doc_detalle_id='{{$doc_detalle->id}}'
             //var detalle= await axios("{{setting('admin.url')}}api/find/detalle/"+doc_detalle_id)
-            var mensaje_derivador='{{$doc_detalle->mensaje}}'
+			var doc_detalle_id='{{$doc_detalle->id}}'
+            var detalle= await axios("{{setting('admin.url')}}api/find/detalle/"+doc_detalle_id)
+			var msj_remitente= htmlToText(documento.data.message)
+			var msj_derivador= htmlToText(detalle.data.mensaje)
 			var mensaje=''
 			if (documento.data.remitente_interno) {
 				var remitente= documento.data.remitente_interno.name
@@ -42,8 +50,8 @@
 			var mensaje=''
 			mensaje+='Hola *'+destinatario.data.name+'*, tiene nueva correspondencia (Derivación).\n'
 			mensaje+='*ID*: '+id+' \n'
-			mensaje+='*Mensaje Remitente*: '+documento.data.message+'\n'
-			mensaje+='*Mensaje Derivador*: '+mensaje_derivador+' \n'
+			mensaje+='*Mensaje Remitente*: '+msj_remitente+'\n'
+			mensaje+='*Mensaje Derivador*: '+msj_derivador+' \n'
 			mensaje+='*Categoria*: '+documento.data.categoria.name+'\n'
 			mensaje+='*Enviado por*: '+remitente+'\n'
 			mensaje+='*Derivado por*: '+derivador.data.name+' \n'

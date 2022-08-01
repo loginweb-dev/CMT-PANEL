@@ -118,17 +118,20 @@
                                         <select class="form-control js-example-basic-single" name="document_categoria" id="document_categoria"></select>
                                     </div>
 
-                                    <div class="form-group col-md-4 text-center">
+                                    {{-- <div class="form-group col-md-4 text-center">
                                         {!! QrCode::generate('QR DE NUEVO REGISTRO!'); !!}
+                                    </div> --}}
+                                    <div class="form-group col-md-4 text-center">
+                                        <button type="submit" class="btn btn-primary save">{{ __('voyager::generic.save') }}</button>
                                     </div>
                                 </div><!-- panel-body -->
 
-                                <div class="panel-footer">
+                                {{-- <div class="panel-footer">
                                     @section('submit-buttons')
                                         <button type="submit" class="btn btn-primary save">{{ __('voyager::generic.save') }}</button>
                                     @stop
                                     @yield('submit-buttons')
-                                </div>
+                                </div> --}}
                             </form>
 
                             <iframe id="form_target" name="form_target" style="display:none"></iframe>

@@ -11,7 +11,7 @@
             const roomName = "mireunion";
             const options = {
                 roomName: roomName,
-                height: screen.height-120,
+                // height: screen.height-120,
                 parentNode: document.querySelector('#meet'),
                 devices: {
                     audioInput: '<deviceLabel>',

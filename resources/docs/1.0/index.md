@@ -1,7 +1,7 @@
-- ## Get Started
-    - [Overview](/{{route}}/{{version}}/overview)
+- ## Manual de Usuarios
+    - [Sobre (cms)](/{{route}}/{{version}}/overview)
     - [Pagina Web](/{{route}}/{{version}}/pagina)
-    - [Gaceta](/{{route}}/{{version}}/pagina)
-    - [Convocatorias](/{{route}}/{{version}}/pagina)
-    - [Gestion Documental](/{{route}}/{{version}}/pagina)
-    - [Chatbot](/{{route}}/{{version}}/pagina)
+    - [Gaceta](/{{route}}/{{version}}/gaceta)
+    - [Convocatorias](/{{route}}/{{version}}/convocatorias)
+    - [Gestion Documental](/{{route}}/{{version}}/gd)
+    - [Chatbot](/{{route}}/{{version}}/chatbot)

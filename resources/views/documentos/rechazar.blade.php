@@ -20,9 +20,16 @@
         $('document').ready(function () {
             rechazar('{{$doc_detalle->documento_id}}')
         });
+		function htmlToText(html) {
+			var temp = document.createElement('div');
+			temp.innerHTML = html;
+			return temp.textContent; // Or return temp.innerText if you need to return only visible text. It's slower.
+		}
 
         async function rechazar(id){
 			var documento= await axios("{{setting('admin.url')}}api/find/documento/"+id)
+			var doc_detalle_id='{{$doc_detalle->id}}'
+            var detalle= await axios("{{setting('admin.url')}}api/find/detalle/"+doc_detalle_id)
 			var mensaje=''
 			if (documento.data.remitente_interno) {
 				var remitente= documento.data.remitente_interno.name
@@ -32,12 +39,12 @@
 				var remitente= documento.data.remitente_externo.display
 				var phone= documento.data.remitente_externo.phone
 			}
-			var mensaje_rechazo='{{$doc_detalle->mensaje}}'
+			var msj_rechazo=htmlToText(detalle.data.mensaje)
 			var link="{{setting('admin.url')}}admin/documentos \n"
 			var mensaje=''
 			mensaje+='Hola *'+remitente+'*, tiene nueva correspondencia (Rechazo).\n'
 			mensaje+='*ID*: '+id+' \n'
-			mensaje+='*Mensaje*: '+mensaje_rechazo+'\n'
+			mensaje+='*Mensaje*: '+msj_rechazo+'\n'
 			mensaje+='*Categoria*: '+documento.data.categoria.name+'\n'
 			mensaje+='*Rechazado por*: '+documento.data.destinatario.name+'\n'
 			mensaje+='Ingresa al Sistema para revisarlo: \n'

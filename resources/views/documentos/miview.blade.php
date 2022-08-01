@@ -104,85 +104,92 @@
 						
 						</tbody>
 					</table>
-					<table class="table table-responsive">
+					<div class="col-sm-6">
+						<table class="table table-responsive">
 						
 							
-						<thead>
-							<td><h5>Mensaje</h5></td>
-						</thead>						
-						<tbody>
-							<tr>
-								<td>
-									<textarea class="form-control" cols="70" rows="10" readonly>{{$midata->message}}</textarea>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-					<table class="table table-responsive">		
-						<thead>
-							<td class="col-sm-6"><h5>PDFs</h5></td>
-							<td class="col-sm-6"><h5>Images</h5></td>
-						</thead>			
-						<tbody>
-							<tr>
-								<td>
-									<div class="col-sm-6"  id="pdf_body"></div>
-								</td>
-								<td>
-									<div class="col-sm-6"  id="images_body"></div>
-								</td>
-								{{-- <td>
-									@php
-										$imagenes=$midata->archivo;
-									@endphp
-									@foreach ($imagenes as $item)
-										{{ $item }}<br>
-									@endforeach
-								</td> --}}
-							</tr>
-						</tbody>
-					</table>
-					<table class="table table-responsive">
-						<thead>
-							<td><h5>Tipo</h5></td>
-							<td><h5>Copia Destinatarios</h5></td>
-							<td><h5>Derivadores</h5></td>
-						</thead>
-						<tbody>
-							<tr>
-								<td>{{ $midata->tipo }}</td>
-								<td>
-									@foreach ($copia as $item)
+							<thead>
+								<td><h5>Mensaje</h5></td>
+							</thead>						
+							<tbody>
+								<tr>
+									<td>
+										<textarea id="editor_prueba" class="form-control richTextBox" cols="70" rows="10" readonly>{{$midata->message}}</textarea>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<div class="col-sm-6">
+						<table class="table table-responsive">		
+							<thead>
+								<td class="col-sm-6"><h5>Archivos</h5></td>
+								<td class="col-sm-6"><h5>Imágenes</h5></td>
+							</thead>			
+							<tbody>
+								<tr>
+									<td>
+										<div class="col-sm-6"  id="pdf_body"></div>
+									</td>
+									<td>
+										<div class="col-sm-6"  id="images_body"></div>
+									</td>
+									{{-- <td>
 										@php
-											$user = TCG\Voyager\Models\User::where('id', $item->user_id)->first();
+											$imagenes=$midata->archivo;
 										@endphp
-										- {{ $user->name }} <br>
-									@endforeach
-								</td>
-								<td>
-									@foreach ($derivadores as $item)
-										@php
-											$user = TCG\Voyager\Models\User::where('id', $item->user_id)->first();
-										@endphp
-										- {{ $user->name }} <br>
-									@endforeach
-								</td>
-							</tr>
-						</tbody>
-						<thead>
-							<td><h5>Editor</h5></td>
-							<td><h5>Creado</h5></td>
-							<td><h5>Actualizado</h5></td>
-						</thead>
-						<tbody>
-							<td>{{ $midata->editor->name }}</td>
-							<td>{{ $midata->created_at }}</td>
-							<td>{{ $midata->updated_at }}</td>
-						</tbody>		
-					</table>
+										@foreach ($imagenes as $item)
+											{{ $item }}<br>
+										@endforeach
+									</td> --}}
+								</tr>
+							</tbody>
+						</table>
+						<table class="table table-responsive">
+							<thead>
+								<td><h5>Tipo</h5></td>
+								<td><h5>Copia Destinatarios</h5></td>
+								<td><h5>Derivadores</h5></td>
+							</thead>
+							<tbody>
+								<tr>
+									<td>{{ $midata->tipo }}</td>
+									<td>
+										@foreach ($copia as $item)
+											@php
+												$user = TCG\Voyager\Models\User::where('id', $item->user_id)->first();
+											@endphp
+											- {{ $user->name }} <br>
+										@endforeach
+									</td>
+									<td>
+										@foreach ($derivadores as $item)
+											@php
+												$user = TCG\Voyager\Models\User::where('id', $item->user_id)->first();
+											@endphp
+											- {{ $user->name }} <br>
+										@endforeach
+									</td>
+								</tr>
+							</tbody>
+							<thead>
+								<td><h5>Editor</h5></td>
+								<td><h5>Creado</h5></td>
+								<td><h5>Actualizado</h5></td>
+							</thead>
+							<tbody>
+								<td>{{ $midata->editor->name }}</td>
+								<td>{{ $midata->created_at }}</td>
+								<td>{{ $midata->updated_at }}</td>
+							</tbody>		
+						</table>
+					</div>
+					
+					
 				</div>
 			</div>
-			<div class="col-sm-6">
+			<div class="col-sm-12">
 				{{-- <div class="col-sm-12 form-group">
 					
 						@php
@@ -229,7 +236,16 @@
                     <img class="img-responsive" src="{{ setting('admin.url').'storage/'.$item }}" alt="">
                 @endforeach --}}
                 {{-- <img class="img-responsive" src="{{ setting('admin.url').'storage/'.'documentos\/April2022\/8bVgIeV3UmrayLBVm56G.png' }}" alt=""> --}}
-
+				<div class="container mt-4 mb-4">
+					<!--Bootstrap classes arrange web page components into columns and rows in a grid -->
+					<div class="row justify-content-md-center">
+						<div class="col-md-12 col-lg-8">
+							<div class="form-group">
+								{{-- <textarea id="editor" hidden></textarea> --}}
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -278,7 +294,7 @@
 	</div> --}}
 
 	<div class="modal modal-primary fade" tabindex="-1" id="AccionesDestinatario" role="dialog">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
@@ -297,30 +313,37 @@
                                 <div class="row">
 									<form action="{{route("respuesta_documento")}}" id="form_responder" method="POST" enctype="multipart/form-data">
 										{{ csrf_field() }}
-										<div class="col-sm-12 form-group">
+										<div class="col-sm-6 form-group">
 											{{-- Mensaje Recibido: <p>{{ $midata->message }}</p> --}}
 											<label for="mensaje_respuesta">Escribe un Mensaje</label>
-											<textarea class="form-control" name="mensaje_respuesta_respondido" id="mensaje_respuesta_respondido" required ></textarea>
+											<textarea class="form-control richTextBox" name="mensaje_respuesta_respondido" id="mensaje_respuesta_respondido"  ></textarea>
 										</div>
+
+					
 										<input type="text" name="user_id" value="{{Auth::user()->id}}" hidden>
 										<input type="text" name="documento_id" value="{{$midata->id}}" hidden>
 										<input type="text" name="destinatario_interno" value="{{$remitente_interno}}" hidden>
 										<input type="text" name="destinatario_externo" value="{{$remitente_externo}}" hidden>
 										<input type="text" name="estado_id_responder" value="3" hidden>
 
+										<div class="col-sm-6 form-group">
 
-										<div class="col-sm-12 form-group">
-											<label for="">Image</label>
-											<input type="file" name="images_respuesta[]" id="images_respuesta" class="form-control" accept="image/gif, image/jpeg, image/png, image/jpg" multiple>
+											<div class="col-sm-12 form-group">
+												<label for="">Image</label>
+												<input type="file" name="images_respuesta[]" id="images_respuesta" class="form-control" accept="image/gif, image/jpeg, image/png, image/jpg" multiple>
+											</div>
+											<div class="col-sm-12 form-group">
+												<label for="">Archivos</label>
+												<input type="file" name="pdf_respuesta[]" id="pdf_respuesta" class="form-control" accept="application/pdf,.csv,.zip,.rar,.tar,.docx,.doc,.xlsx,.xls , application/vnd.openxmlformats-officedocument.spreadsheetml.sheet , application/vnd.ms-excel" multiple>
+												<small><b>Si quiere enviar otro tipo de archivos comprímalo en un ZIP para que posteriormente se pueda descargar con normalidad.</b></small>
+											</div>
+											<div class="col-sm-12 form-group">
+												<button type="submit" onclick="deshabilitar_botones()" id="button_respuesta" class="btn btn-primary" > Responder <i class="voyager-paper-plane"></i> </button>
+												{{-- <a href="#" onclick="responder('{{ $midata->id }}')" class="btn btn-primary">Responder</a> --}}
+											</div>
+
 										</div>
-										<div class="col-sm-12 form-group">
-											<label for="">PDF</label>
-											<input type="file" name="pdf_respuesta[]" id="pdf_respuesta" class="form-control" accept="application/pdf, application/xlsx" multiple>
-										</div>
-										<div class="col-sm-12 form-group">
-											<button type="submit" onclick="deshabilitar_botones()" id="button_respuesta" class="btn btn-primary" > Responder <i class="voyager-paper-plane"></i> </button>
-											{{-- <a href="#" onclick="responder('{{ $midata->id }}')" class="btn btn-primary">Responder</a> --}}
-										</div>
+
 									</form>
 									
                                    
@@ -330,22 +353,25 @@
                                 <div class="row">
 									<form action="{{route("derivar_documento")}}" id="form_derivar" method="POST" enctype="multipart/form-data">
 										{{ csrf_field() }}
-										<div class="col-sm-12 form-group">
-											{{-- Mensaje Recibido: <p>{{ $midata->message }}</p> --}}
+										<div class="col-sm-6 form-group">
 											<label for="mensaje_respuesta">Escribe un Mensaje</label>
-											<textarea class="form-control" name="mensaje_respuesta_derivado" id="mensaje_respuesta_derivado" required ></textarea>
+											<textarea class="form-control richTextBox" name="mensaje_respuesta_derivado" id="mensaje_respuesta_derivado"  ></textarea>
 										</div>
 										<input type="text" name="documento_id_derivacion" value="{{$midata->id}}" hidden>
 										<input type="text" name="user_id_derivacion" value="{{Auth::user()->id}}" hidden>
 										<input type="text" name="estado_id_derivacion" value="2" hidden>
 
-										<div class="col-sm-12 form-group">
-											<label for="destinatario_id_derivacion">Usuarios</label>
-											<select class="form-control" name="destinatario_id_derivacion" id="destinatario_id_derivacion" ></select>
+										<div class="col-sm-6 form-group">
+
+											<div class="col-sm-12 form-group">
+												<label for="destinatario_id_derivacion">Usuarios</label>
+												<select class="form-control" name="destinatario_id_derivacion" id="destinatario_id_derivacion" ></select>
+											</div>
+											<div class="col-sm-12 form-group">
+												<button type="submit" onclick="deshabilitar_botones()" id="button_derivacion" class="btn btn-success">Derivar <i class="voyager-forward"></i></button>
+											</div>
 										</div>
-										<div class="col-sm-12 form-group">
-											<button type="submit" onclick="deshabilitar_botones()" id="button_derivacion" class="btn btn-success">Derivar <i class="voyager-forward"></i></button>
-										</div>
+
 
 									</form>
                                     
@@ -355,10 +381,9 @@
                                 <div class="row">
 									<form action="{{route("rechazar_documento")}}" id="form_rechazar" method="POST" enctype="multipart/form-data">
 										{{ csrf_field() }}										
-										<div class="col-sm-12 form-group">
-											{{-- Mensaje Recibido: <p>{{ $midata->message }}</p> --}}
+										<div class="col-sm-6 form-group">
 											<label for="mensaje_respuesta">Escribe un Mensaje</label>
-											<textarea class="form-control" name="mensaje_respuesta_rechazado" id="mensaje_respuesta_rechazado" required ></textarea>
+											<textarea class="form-control richTextBox" name="mensaje_respuesta_rechazado" id="mensaje_respuesta_rechazado"  ></textarea>
 										</div>
 										<input type="text" name="documento_id_rechazo" value="{{$midata->id}}" hidden>
 										<input type="text" name="user_id_rechazo" value="{{Auth::user()->id}}" hidden>
@@ -366,10 +391,12 @@
 										<input type="text" name="destinatario_interno_rechazo" value="{{$remitente_interno}}" hidden>
 										<input type="text" name="destinatario_externo_rechazo" value="{{$remitente_externo}}" hidden>
 
-
-										<div class="col-sm-12 form-group">
-											<button type="submit" onclick="deshabilitar_botones()" id="button_rechazo" class="btn btn-danger">Rechazar <i class="voyager-x"></i></button>
+										<div class="col-sm-6 form-group">
+											<div class="col-sm-12 form-group">
+												<button type="submit" onclick="deshabilitar_botones()" id="button_rechazo" class="btn btn-danger">Rechazar <i class="voyager-x"></i></button>
+											</div>
 										</div>
+										
 									</form>
 									
                                 </div>
@@ -415,7 +442,7 @@
 										<td>Orden</td>
 										<td>Mensaje</td>
 										<td>Imagen</td>
-										<td>PDF</td>
+										<td>Archivo</td>
 										<td>Remitente</td>
 										<td>Destinatario</td>
 										<td>Estado</td>
@@ -439,7 +466,10 @@
 											<td>
 												{{$index_arbol_orden}}
 											</td>
-											<td>{{$item->mensaje}}</td>
+											<td>
+												<div id="message_arbol_{{$item->id}}"></div>
+											</td>
+											{{-- <td>{{$item->mensaje}}</td> --}}
 											<td>
 												<div id="images_arbol_{{$item->id}}"></div>
 											</td>
@@ -478,21 +508,74 @@
 
 @stop
 
+@push('javascript')
+	<script>
+		$(document).ready(function() {
+			var additionalConfig = {
+				// selector: 'textarea.richTextBox[name="editor_prueba"]',
+
+				// selector: 'textarea#editor_prueba',
+				selector: '.richTextBox'
+
+			}
+
+			$.extend(additionalConfig, {!! json_encode($options->tinymceOptions ?? '{}') !!})
+
+			tinymce.init(window.voyagerTinyMCE.getConfig(additionalConfig));
+		});
+	</script>
+@endpush
 
 @section('javascript')
 	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	{{-- <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script> --}}
+
+	{{-- <script>
+	tinymce.init({
+		selector: 'textarea#editor',
+		skin: 'bootstrap',
+		plugins: 'lists, link, image, media',
+		toolbar: 'h1 h2 bold italic strikethrough blockquote bullist numlist backcolor | link image media | removeformat help',
+		menubar: false,
+		});
+	</script> --}}
+	
 	<script>
 
         $('document').ready(function () {
 			destinatario_simple()
 			mostrar_imgs_documento()
 			mostrar_pdfs_documento()
+			mostrar_message_arbol()
 			mostrar_imgs_arbol()
 			mostrar_pdfs_arbol()
 			remitente_arbol()
 			destinatario_arbol()
 			
         });
+		function htmlToText(html) {
+			var temp = document.createElement('div');
+			temp.innerHTML = html;
+			return temp.textContent; // Or return temp.innerText if you need to return only visible text. It's slower.
+		}
+		async function mostrar_message_arbol(){
+			// message_arbol
+			var id='{{$midata->id}}'
+			// var id_doc={
+			// 	id:id
+			// }
+			// var arbol_messages=await axios.post("{{setting('admin.url')}}api/find/message/arbol", id_doc)
+			var detalle= await axios("{{setting('admin.url')}}api/find/documento/detalle/"+id)
+
+			if (detalle.data.length>0) {
+				var lista=""
+				for (let index = 0; index < detalle.data.length; index++) {
+					var mensaje= htmlToText(detalle.data[index].mensaje)
+					lista="<tr><td>"+mensaje+"</td></tr>"
+					$('#message_arbol_'+detalle.data[index].id+'').html(lista)
+				}
+			}
+		}
 		async function mostrar_imgs_documento(){
 			var id='{{$midata->id}}'
 			var id_doc={
@@ -516,7 +599,17 @@
 			if (pdfs.data) {
 				var lista=""
 				for (let index = 0; index < pdfs.data.length; index++) {
-					lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+pdfs.data[index].download_link+"' class='link-primary'>"+pdfs.data[index].original_name+"</a></td></tr>"
+					
+					var validacion_pdf=pdfs.data[index].original_name.split(".").pop()
+
+					if (validacion_pdf=="pdf") {
+						// lista+="<tr><td><object data='https://www.uv.mx/personal/artulopez/files/2012/08/02_TS-y-TI.pdf' type='application/pdf' ><iframe src='https://docs.google.com/viewer?url=https://www.uv.mx/personal/artulopez/files/2012/08/02_TS-y-TI.pdf&embedded=true'></iframe></object></td></tr>"
+						lista+="<tr><td><iframe src='https://docs.google.com/viewer?url={{ setting('admin.url').'storage/' }}"+pdfs.data[index].download_link+"&embedded=true'></iframe></td></tr>"
+
+					}
+					else{
+						lista+="<tr><td><a href='{{ setting('admin.url').'storage/' }}"+pdfs.data[index].download_link+"' class='link-primary'>"+pdfs.data[index].original_name+"</a></td></tr>"
+					}
 				}
 				$('#pdf_body').html(lista)
 			}
@@ -636,10 +729,11 @@
 			else if(documento.data.remitente_externo){
 				var remitente= documento.data.remitente_externo.display
 			}
+			var msj=htmlToText(documento.data.message)
 			var link="{{setting('admin.url')}}admin/documentos \n"
 			mensaje+='Hola *'+documento.data.destinatario.name+'*, tiene nueva correspondencia.\n'
 			mensaje+='*ID*: '+id+' \n'
-			mensaje+='*Mensaje*: '+documento.data.message+'\n'
+			mensaje+='*Mensaje*: '+msj+'\n'
 			mensaje+='*Categoria*: '+documento.data.categoria.name+'\n'
 			mensaje+='*Enviado por*: '+remitente+'\n'
 			mensaje+='Ingresa al Sistema para revisarlo: \n'
@@ -657,7 +751,7 @@
 				var mensaje=''
 				mensaje+='Hola *'+destinatario_copia.data.name+'*, tiene nueva correspondencia (Copia).\n'
 				mensaje+='*ID*: '+id+' \n'
-				mensaje+='*Mensaje*: '+documento.data.message+'\n'
+				mensaje+='*Mensaje*: '+msj+'\n'
 				mensaje+='*Categoria*: '+documento.data.categoria.name+'\n'
 				mensaje+='*Enviado por*: '+remitente+'\n'
 				mensaje+='Ingresa al Sistema para revisarlo: \n'

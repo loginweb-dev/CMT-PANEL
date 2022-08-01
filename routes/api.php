@@ -265,3 +265,8 @@ Route::get('preguntas', function () {
 Route::get('concejales', function () {
     return Concejale::orderBy('created_at', 'desc')->get();
 });
+
+//Message Arbol
+Route::post('find/message/arbol', function(Request $request){
+    return DocumentoDetalle::where('documento_id',$request->id)->get();
+});

@@ -20,13 +20,18 @@
         $('document').ready(function () {
             RemitenteExterno()
         });
+        function htmlToText(html) {
+			var temp = document.createElement('div');
+			temp.innerHTML = html;
+			return temp.textContent; // Or return temp.innerText if you need to return only visible text. It's slower.
+		}
 
         async function RemitenteExterno(){
             var id='{{$doc_detalle->documento_id}}'
             var doc_detalle_id='{{$doc_detalle->id}}'
             var detalle= await axios("{{setting('admin.url')}}api/find/detalle/"+doc_detalle_id)
             var documento= await axios("{{setting('admin.url')}}api/find/documento/"+id)
-            var mensaje_respuesta='{{$doc_detalle->mensaje}}'
+            var msj_respuesta=htmlToText(detalle.data.mensaje)
             var link="{{setting('admin.url')}}admin/documentos \n"
             
             if (documento.data.remitente_interno) {
@@ -36,7 +41,7 @@
 				mensaje=''
 				mensaje+='Hola *'+remitente+'*, tiene nueva correspondencia (Respuesta).\n'
 				mensaje+='*ID*: '+id+' \n'
-				mensaje+='*Mensaje*: '+mensaje_respuesta+'\n'
+				mensaje+='*Mensaje*: '+msj_respuesta+'\n'
 				mensaje+='*Categoria*: '+documento.data.categoria.name+'\n'
 				mensaje+='*Enviado por*: '+documento.data.destinatario.name+'\n'
 				mensaje+='Ingresa al Sistema para revisarlo: \n'
@@ -59,7 +64,7 @@
                 mensaje=''
                 mensaje+='Hola *'+remitente+'*, tiene nueva correspondencia (Respuesta).\n'
                 mensaje+='*ID*: '+id+' \n'
-                mensaje+='*Mensaje*: '+mensaje_respuesta+'\n'
+                mensaje+='*Mensaje*: '+msj_respuesta+'\n'
                 mensaje+='*Categoria*: '+documento.data.categoria.name+'\n'
                 mensaje+='*Enviado por*: '+documento.data.destinatario.name+'\n'
                 mensaje+='*Documentos Adjuntos*:\n \n'
