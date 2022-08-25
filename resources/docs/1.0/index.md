@@ -4,4 +4,4 @@
     - [Gaceta](/{{route}}/{{version}}/gaceta)
     - [Convocatorias](/{{route}}/{{version}}/convocatorias)
     - [Gestion Documental](/{{route}}/{{version}}/gd)
-    - [Chatbot](/{{route}}/{{version}}/chatbot)
+    <!-- - [Chatbot](/{{route}}/{{version}}/chatbot) -->

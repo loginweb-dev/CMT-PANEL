@@ -1,4 +1,4 @@
-# SISTEMA de GESTION de CONTENIDO (cms)
+# SISTEMA GESTIÓN de CONTENIDO (cms)
 
 ---
 
