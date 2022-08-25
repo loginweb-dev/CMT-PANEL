@@ -1,6 +1,6 @@
 /node_modules
 /public/hot
-/public/storage
+# /public/storage
 /public/chatbot/node_modules
 /public/chatbot/package-lock.json
 /public/chatbot/.wwebjs_auth

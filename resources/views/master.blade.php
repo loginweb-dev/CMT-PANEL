@@ -251,6 +251,7 @@
       border-radius: 12px;
     }
   </style>
+  @yield('css')
 </head>
 
 <body>

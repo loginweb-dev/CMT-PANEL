@@ -8,7 +8,7 @@
 	  <div class="row">
 		<h3 class="text-center">ESTRUCTURA DEL CONCEJO</h3>
 		<div class="col-lg-6 mt-3">
-		  <img src="https://panel.cmt.gob.bo//storage/landingpage/estructura.jpg" class="img-fluid" alt="">
+		  <img src="https://cmt.gob.bo//storage/landingpage/estructura.jpg" class="img-fluid" alt="">
 		</div>
 		<div class="col-lg-6 d-flex flex-column justify-contents-center mt-3" data-aos="fade-left">
 		  <div class="content pt-4 pt-lg-0">
@@ -55,7 +55,7 @@
 		  <div class="tab-content">
 			<div class="tab-pane active show" id="tab-0">
 			  <figure>
-				<img src="https://panel.cmt.gob.bo//storage/landingpage/BannerPrincipal.jpeg" alt="" class="img-fluid">
+				<img src="https://cmt.gob.bo//storage/landingpage/BannerPrincipal.jpeg" alt="" class="img-fluid">
 			  </figure>
 			</div>
 
@@ -77,7 +77,7 @@
 	  <div class="row">
 		<h3 class="text-center">LA DIRECTIVA</h3>
 		<div class="col-lg-6 mt-3">
-		  <img src="https://panel.cmt.gob.bo//storage/landingpage/ladirectiva.jpg" class="img-fluid" alt="">
+		  <img src="https://cmt.gob.bo//storage/landingpage/ladirectiva.jpg" class="img-fluid" alt="">
 		</div>
 		<div class="col-lg-6 d-flex flex-column justify-contents-center mt-3" data-aos="fade-left">
 		  <div class="content pt-4 pt-lg-0">
